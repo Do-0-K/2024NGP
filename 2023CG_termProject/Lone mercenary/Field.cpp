@@ -35,6 +35,8 @@ void Field::Update()
 	dynamic_cast<Player*>(mPlayer)->attack(enemy_list, mCamera);
 	mCamera->setCameraEYE(dynamic_cast<Player*>(mPlayer)->getLoc());		// 카메라 업데이트 해주기
 	mCamera->setCameraAngle(dynamic_cast<Player*>(mPlayer)->getRot());
+	// 여기서 서버에게 위치랑 필요한거 넘기기
+	
 	// 총기 위치 변경
 	dynamic_cast<Player*>(mPlayer)->take_out_Wep();
 	dynamic_cast<Player*>(mPlayer)->getWeapon()->setLoc(dynamic_cast<Player*>(mPlayer)->getLoc());
@@ -42,6 +44,9 @@ void Field::Update()
 	dynamic_cast<Player*>(mPlayer)->reload_ani();
 	dynamic_cast<Player*>(mPlayer)->knife_AT_ani();
 
+
+	// 서버에서 받을 예정, 준비 되면 삭제
+	//===========================================================
 	int alive{};
 	EnemyBase* aliveEnemy[MAX_ALIVE];
 	bool update_first = false;
@@ -57,6 +62,8 @@ void Field::Update()
 		}
 	}
 
+
+
 	for (int i = 0; i < alive; ++i) {
 		aliveEnemy[i]->setPlayerLoc(mPlayer);
 		if (dynamic_cast<NM_zombie*>(aliveEnemy[i])->getlarm()->collision_check(*mField->gethouse_1())
@@ -71,14 +78,23 @@ void Field::Update()
 		dynamic_cast<NM_zombie*>(aliveEnemy[i])->z_heal(enemy_list);
 		dynamic_cast<NM_zombie*>(aliveEnemy[i])->z_boom();
 	}
+	//==============================================================================
 
+
+	// 모래시계? 제거 예정
+	//====================================================
 	for (Timerplus*& t : sandglass) {
 		t->check_collision();
 		t->rot_ani();
 	}
+	//======================================================
+
+	// 서버가 아이템 박스 관리
+	//===================================================
 	item->check_collision();
 	item->check_time();
 	item->rot_ani();
+	//====================================================
 	mUi->Update();
 }
 

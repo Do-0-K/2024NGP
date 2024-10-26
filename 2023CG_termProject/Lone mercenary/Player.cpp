@@ -334,7 +334,8 @@ void Player::attack(std::vector<EnemyBase*>& list, CameraObj* t_camera)
 		if (cur_Wea == rifle) {
 			if (cnt % 10 == 0) {
 				cur_Wea->Shoot();
-				if (cur_Wea->exist_ammo()) {
+				if (cur_Wea->exist_ammo()) {	// 총알이 있다
+					// 공격할 때 서버에게 정보 전달
 					attack_check(list, t_camera);
 					mSound->play_s_shot(cur_Wea->getWep());
 					cur_rot.y += 1.0f; //반동
@@ -346,6 +347,7 @@ void Player::attack(std::vector<EnemyBase*>& list, CameraObj* t_camera)
 			cur_Wea->Shoot();
 			if (cur_Wea == pistol) {
 				if (cur_Wea->exist_ammo()) {
+					// 공격할 때 서버에게 정보 전달
 					attack_check(list, t_camera);
 					mSound->play_s_shot(cur_Wea->getWep());
 					cur_rot.y += 1.0f; //반동
@@ -353,6 +355,7 @@ void Player::attack(std::vector<EnemyBase*>& list, CameraObj* t_camera)
 				}
 			}
 			else {
+				// 공격할 때 서버에게 정보 전달
 				attack_check(list, t_camera);
 				mSound->play_s_shot(cur_Wea->getWep());
 				knife_at = true;

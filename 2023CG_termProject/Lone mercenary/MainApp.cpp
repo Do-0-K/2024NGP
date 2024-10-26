@@ -110,12 +110,14 @@ void MainApp::next_state()
 			mSound->play_fieldbgm();
 			MouseFunc::s_x = -1;
 			MouseFunc::s_y = -1;
+			// 여기서 한번 서버한테 완료 메시지 보내기
 		}
 		break;
 	case 필드:
 		if (mPlayer->Death_check() || Allkill_check() || game_timer->getremaining() == 0) {
 			glutSetCursor(GLUT_CURSOR_RIGHT_ARROW);
 			game_state = 결과창;
+			// 결과창 내보내기 전에 서버에게 개별 점수 받기
 			dynamic_cast<ScoreBoard*>(score_scene)->Update_1();
 			delete current_scene;
 			current_scene = score_scene;
@@ -155,6 +157,7 @@ void MainApp::next_state()
 // 현재 장면 업데이트
 bool MainApp::Update_MainApp()
 {
+	// 서버에게서 필요한 정보 받기
 	current_scene->Update();
 	return true;
 }

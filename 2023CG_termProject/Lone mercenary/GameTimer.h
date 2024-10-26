@@ -9,6 +9,7 @@
 #include "stdafx.h"
 #include "Player.h"
 
+// 타이머는 혼자 흐르지 말고 서버에게 받은 시간을 출력하는걸로
 class GameTimer {
 public:
 	GameTimer(CharacterBase*);
