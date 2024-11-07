@@ -7,6 +7,7 @@
 MainApp::~MainApp()
 {
 	DestroyMainApp();
+	//커밋 확인
 }
 
 // 최종본엔 이걸 사용할것
