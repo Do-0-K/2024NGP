@@ -13,7 +13,7 @@
 
 class Field : public Scene {
 public:
-	Field(CharacterBase*, FieldMap*, CameraObj*, std::vector<EnemyBase*>&, GameTimer*, CubeMap*);
+	Field(CharacterBase*, FieldMap*, CameraObj*, std::vector<EnemyBase*>&, GameTimer*, CubeMap*, std::shared_ptr<SOCKET>& pSock);
 	~Field();
 
 	CharacterBase* getPlayer();
@@ -41,4 +41,6 @@ private:
 
 	int max_alive{};		// 한 필드에 최대 존재 좀비 수
 	int aliving{};		// 한 필드에 존재하는 좀비 수
+
+	std::shared_ptr<SOCKET> m_pSock;	// 클라이언트 소켓
 };
