@@ -154,6 +154,35 @@ void MainApp::next_state()
 	}
 }
 
+void MainApp::connet()
+{
+	int retval;
+
+	WSADATA wsa;
+	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+		return;
+
+	sock = createSocket(); //소켓 생성 및 shared_ptr로 감싸기
+
+	struct sockaddr_in serveraddr;
+	memset(&serveraddr, 0, sizeof(serveraddr));
+	serveraddr.sin_family = AF_INET;
+
+	// 호스트의 IP 주소를 알아내기
+	char hostName[256];
+	if (gethostname(hostName, sizeof(hostName))==SOCKET_ERROR)err_quit("gethostname()");
+	hostent* ptr = gethostbyname(hostName);
+	if (ptr == nullptr)err_quit("gethostname()");
+
+	// 알아낸 IP를 set해주기
+	memcpy(&serveraddr.sin_addr, ptr->h_addr_list[0], ptr->h_length);
+
+	serveraddr.sin_port = htons(/*서버 포트 번호*/);
+	retval = connect(*sock, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
+	if (retval == SOCKET_ERROR) err_quit("connect()");
+
+}
+
 
 // 현재 장면 업데이트
 bool MainApp::Update_MainApp()
