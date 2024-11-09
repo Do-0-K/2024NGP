@@ -34,7 +34,7 @@ public:
 	bool Render();
 	void next_state();
 
-	void connet();
+	void MainAppConnect();
 	KeyboardFunc* pKeyboard;
 	MouseFunc* pMouse;
 
@@ -47,7 +47,7 @@ private:
 	ProjObj* proj;
 	CharacterBase* mPlayer;
 
-	std::shared_ptr<SOCKET> sock;
+	std::shared_ptr<SOCKET> m_pSock;
 
 	std::vector<EnemyBase*> enemy_array;
 	GameTimer* game_timer;

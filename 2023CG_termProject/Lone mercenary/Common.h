@@ -52,9 +52,3 @@ void err_display(int errcode)
 	printf("[오류] %s\n", (char*)lpMsgBuf);
 	LocalFree(lpMsgBuf);
 }
-
-std::shared_ptr<SOCKET>createSocket() {
-	SOCKET sock = socket(AF_INET, SOCK_STREAM, 0); //소켓 생성
-	if (sock == INVALID_SOCKET) { return nullptr; } //이상하면 null
-	return std::make_shared<SOCKET>(sock); //동적할당 후 shared_ptr로 감싸기
-}
