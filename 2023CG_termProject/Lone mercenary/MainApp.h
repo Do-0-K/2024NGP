@@ -7,6 +7,7 @@
 #include "KeyboardFunc.h"
 #include "MouseFunc.h"
 #include "Sound.h"
+#include "Common.h"
 
 class CharacterBase;
 class CameraObj;
@@ -32,6 +33,8 @@ public:
 
 	bool Render();
 	void next_state();
+
+	void MainAppConnect();
 	KeyboardFunc* pKeyboard;
 	MouseFunc* pMouse;
 
@@ -44,7 +47,7 @@ private:
 	ProjObj* proj;
 	CharacterBase* mPlayer;
 
-
+	std::shared_ptr<SOCKET> m_pSock;
 
 	std::vector<EnemyBase*> enemy_array;
 	GameTimer* game_timer;

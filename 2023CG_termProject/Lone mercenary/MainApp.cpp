@@ -154,6 +154,35 @@ void MainApp::next_state()
 	}
 }
 
+void MainApp::MainAppConnect()
+{
+	int retval;
+
+	WSADATA wsa;
+	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+		return;
+
+	m_pSock = std::make_shared<SOCKET>();
+	*m_pSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+	struct sockaddr_in serveraddr;
+	memset(&serveraddr, 0, sizeof(serveraddr));
+	serveraddr.sin_family = AF_INET;
+
+	// 호스트의 IP 주소를 알아내기
+	const char* hostName = "";// 서버로 사용할 호스트 이름
+	hostent* ptr = gethostbyname(hostName);
+	if (ptr == nullptr)err_quit("gethostname()");
+
+	// 알아낸 IP를 set해주기
+	memcpy(&serveraddr.sin_addr, ptr->h_addr_list[0], ptr->h_length);
+
+	serveraddr.sin_port = htons(1111);	// 포트번호 정해지면 수정
+	retval = connect(*m_pSock, (sockaddr*)&serveraddr, sizeof(serveraddr));
+	if (retval == SOCKET_ERROR) err_quit("connect()");
+
+}
+
 
 // 현재 장면 업데이트
 bool MainApp::Update_MainApp()
@@ -276,6 +305,11 @@ void MainApp::DestroyMainApp()
 			delete e;
 		enemy_array.clear();
 	}
+
+	// 앱 종료시 반환
+	closesocket(*m_pSock);
+	WSACleanup();
+
 }
 
 bool MainApp::Allkill_check()

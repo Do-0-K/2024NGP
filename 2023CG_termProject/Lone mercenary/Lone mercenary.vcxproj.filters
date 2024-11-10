@@ -313,6 +313,9 @@
     <ClInclude Include="Sound.h">
       <Filter>소스 파일\Fmod sound</Filter>
     </ClInclude>
+    <ClInclude Include="Common.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderFile\FragmentShader.glsl">
