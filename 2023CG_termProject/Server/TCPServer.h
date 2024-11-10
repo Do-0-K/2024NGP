@@ -7,9 +7,11 @@
 
 class TCPServer {
 public:
-    TCPServer() {};
+    TCPServer(const char* ipAddress,int portNum);
     ~TCPServer();
-
+    void Update();
+    void Collision_Check();
+    DWORD WINAPI Client_Thread(LPVOID args);
     void BindAndListen();
     void Execute();
 

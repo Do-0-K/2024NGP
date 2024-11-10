@@ -14,7 +14,7 @@ void TCPServer::BindAndListen()
         std::cout << "Socket creation failed." << std::endl;
         exit(1);
     }
-
+   
 
     sockaddr_in serverAddr;
     memset(&serverAddr, 0, sizeof(serverAddr));
