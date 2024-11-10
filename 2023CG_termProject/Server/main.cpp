@@ -1,6 +1,7 @@
 #include "TCPServer.h"
+TCPServer mainServer;
 
-int main()
+int main() 
 {
-	
+	mainServer.Execute();
 }
