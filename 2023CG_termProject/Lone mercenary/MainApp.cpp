@@ -173,6 +173,7 @@ void MainApp::MainAppConnect()
 	const char* hostName = "";// 서버로 사용할 호스트 이름
 	hostent* ptr = gethostbyname(hostName);
 	if (ptr == nullptr)err_quit("gethostname()");
+	//보여 경환?
 
 	// 알아낸 IP를 set해주기
 	memcpy(&serveraddr.sin_addr, ptr->h_addr_list[0], ptr->h_length);
