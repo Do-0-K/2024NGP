@@ -24,3 +24,13 @@ void EnemyBase::attack()
 	}
 }
 
+void EnemyBase::setLoc(glm::vec3 loc)
+{
+	cur_loc = loc;
+}
+
+void EnemyBase::setRot(glm::vec2 rot)
+{
+	cur_rot = rot;
+	
+}

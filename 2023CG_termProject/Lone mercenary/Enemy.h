@@ -23,7 +23,8 @@ public:
 
 	virtual void attack();
 	
-	
+	virtual void setLoc(glm::vec3 loc);
+	virtual void setRot(glm::vec2 rot);
 
 	void setPlayerLoc(CharacterBase*);
 	glm::vec3 getLoc();

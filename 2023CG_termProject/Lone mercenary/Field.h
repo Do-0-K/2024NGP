@@ -37,7 +37,7 @@ private:
 	GameTimer* mTimer{ nullptr };
 	UI* mUi;
 	ItemBox* item;
-	Timerplus* sandglass[3];
+	std::unique_ptr<EnemyBase> m_pOpposite;
 
 	int max_alive{};		// 한 필드에 최대 존재 좀비 수
 	int aliving{};		// 한 필드에 존재하는 좀비 수

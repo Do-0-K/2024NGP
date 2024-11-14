@@ -95,6 +95,15 @@ NM_zombie::NM_zombie(float hp, float max, float spd, float def, float atk, int t
 		leg[0] = new NM_Mesh("obj_source\\zombie\\NM_zombie\\NM_zombie_leftleg.obj", "obj_source\\zombie\\NM_zombie\\bomb_zombie.png", 1024, 1024);
 		leg[1] = new NM_Mesh("obj_source\\zombie\\NM_zombie\\NM_zombie_rightleg.obj", "obj_source\\zombie\\NM_zombie\\bomb_zombie.png", 1024, 1024);
 		break;
+	case 사람:
+		// 사람 텍스쳐로 바꾸자
+		head = new NM_Mesh("obj_source\\zombie\\NM_zombie\\NM_zombie_head.obj", "obj_source\\zombie\\NM_zombie\\bomb_zombie.png", 1024, 1024);
+		body = new NM_Mesh("obj_source\\zombie\\NM_zombie\\NM_zombie_body.obj", "obj_source\\zombie\\NM_zombie\\bomb_zombie.png", 1024, 1024);
+		arm[0] = new NM_Mesh("obj_source\\zombie\\NM_zombie\\NM_zombie_leftarm.obj", "obj_source\\zombie\\NM_zombie\\bomb_zombie.png", 1024, 1024);
+		arm[1] = new NM_Mesh("obj_source\\zombie\\NM_zombie\\NM_zombie_rightarm.obj", "obj_source\\zombie\\NM_zombie\\bomb_zombie.png", 1024, 1024);
+		leg[0] = new NM_Mesh("obj_source\\zombie\\NM_zombie\\NM_zombie_leftleg.obj", "obj_source\\zombie\\NM_zombie\\bomb_zombie.png", 1024, 1024);
+		leg[1] = new NM_Mesh("obj_source\\zombie\\NM_zombie\\NM_zombie_rightleg.obj", "obj_source\\zombie\\NM_zombie\\bomb_zombie.png", 1024, 1024);
+		break;
 	}
 	head->init_scale(0.15);
 	body->init_scale(0.15);
