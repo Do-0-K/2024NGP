@@ -19,6 +19,7 @@ private:
     SOCKET listen_sock = NULL;
     std::vector<SOCKET> client_sockets;
     std::vector<HANDLE> client_threads;
+    int clientCount = 0;  // 클라이언트 수를 추적하기 위한 멤버 변수 추가
 
     void AcceptClients();
     static DWORD WINAPI ClientThread(LPVOID clientSocket);
