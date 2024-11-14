@@ -7,7 +7,7 @@
 
 class TCPServer {
 public:
-    TCPServer(const char* ipAddress,int portNum);
+    TCPServer();
     ~TCPServer();
     void Update();
     void Collision_Check();
