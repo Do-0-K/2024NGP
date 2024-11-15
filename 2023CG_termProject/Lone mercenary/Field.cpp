@@ -5,7 +5,7 @@
 #pragma pack(1)
 struct PlayerInfo {
 	glm::vec3 cameraEYE;
-	glm::vec3 cameraAT;
+	glm::vec2 Angle;
 };
 
 struct RenderInfo {
@@ -47,7 +47,7 @@ void Field::Update()
 	mCamera->setCameraAngle(dynamic_cast<Player*>(mPlayer)->getRot());
 	// 여기서 서버에게 위치랑 필요한거 넘기기
 	
-	PlayerInfo playerInfo{ mCamera->getEYE(), mCamera->getAT() };
+	PlayerInfo playerInfo{ mCamera->getEYE(), mCamera->getAngle() };
 	// 내 위치 보내기
 	send(*m_pSock, (char*)&playerInfo, sizeof(playerInfo), 0);
 
@@ -62,7 +62,15 @@ void Field::Update()
 	RenderInfo renderInfo;
 	recv(*m_pSock, (char*)&renderInfo, sizeof(RenderInfo), MSG_WAITALL);
 
+	// 옳바른 각으로 회전하는지 확인 필요
+	glm::vec3 oppEYE = renderInfo.opposite.cameraEYE;
+	glm::vec2 oppAngle = renderInfo.opposite.Angle;
+	oppEYE.y = 0; oppAngle.y = 0;
 	
+	m_pOpposite->setLoc(oppEYE);
+	m_pOpposite->setRot(oppAngle);
+
+
 
 	// 서버에서 받을 예정, 준비 되면 삭제
 	//===========================================================
