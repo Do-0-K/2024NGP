@@ -207,8 +207,10 @@ bool MainApp::e_arrayReady()
 		enemy_array.clear();
 		std::cout << "Current List size: " << enemy_array.size() << std::endl;
 	}
-	enemy_array.reserve(14); //서버로부터 14명 받아올거기 때문에 초기화 후 14개만 미리 할당받는다
-
+	enemy_array.reserve(14);
+	for (int i = 0; i < 14; ++i) {
+		enemy_array.push_back(new NM_zombie(1200, 1350, 20, 30, 27, 일반));
+	}
 	return true;
 }
 
