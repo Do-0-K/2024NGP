@@ -88,6 +88,7 @@ void TCPServer::AcceptClients() {
     std::cout << "Two clients connected. No longer accepting new connections." << std::endl;
 }
 
+// 이건 아직 미완이죠?
 DWORD WINAPI TCPServer::ClientThread(LPVOID clientSocket) {
     PlayerInfo playerinfo;
     SOCKET client = (SOCKET)clientSocket;
