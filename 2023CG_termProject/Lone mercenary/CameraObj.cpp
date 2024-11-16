@@ -72,3 +72,8 @@ glm::vec3 CameraObj::getAT()
 {
 	return cameraAT;
 }
+
+glm::vec2 CameraObj::getAngle()
+{
+	return rotation_angle;
+}

@@ -1,5 +1,11 @@
 #include "TCPServer.h"
 
+#pragma pack(1)
+struct PlayerInfo {
+    glm::vec3 cameraEYE;
+    glm::vec2 Angle;
+};
+#pragma pack()
 
 TCPServer::TCPServer()
 {
@@ -55,12 +61,15 @@ void TCPServer::Execute() {
     BindAndListen();
     std::cout << "Waiting for clients to connect..." << std::endl;
     AcceptClients();
+    // 이 함수 두명 받으면 끝인데 서버 유지 되나요?
 }
 
+// 이렇게 하면 소켓 살아있나요?
 void TCPServer::AcceptClients() {
     struct sockaddr_in clientaddr;
     int addrlen;
     while (clientCount < 2) {  // Accept only two clients
+        // 이거 남아있는지 확인이 필요한데
         SOCKET clientSocket = accept(listen_sock, (struct sockaddr*)&clientaddr, &addrlen);
         if (clientSocket == INVALID_SOCKET) {
             std::cout << "Accept failed." << std::endl;
@@ -72,19 +81,21 @@ void TCPServer::AcceptClients() {
         HANDLE clientThread = CreateThread(NULL, 0, ClientThread, (LPVOID)clientSocket, 0, NULL);
         client_threads.push_back(clientThread);
 
-        clientCount++;
+        ++clientCount;
     }
 
     closesocket(listen_sock);  // Stop accepting new connections
     std::cout << "Two clients connected. No longer accepting new connections." << std::endl;
 }
 
+// 이건 아직 미완이죠?
 DWORD WINAPI TCPServer::ClientThread(LPVOID clientSocket) {
     PlayerInfo playerinfo;
     SOCKET client = (SOCKET)clientSocket;
     char buffer[1024];
     int recvSize;
 
+    // PlayerInfo 받는게 안에 있는데 버퍼에는 뭘 받는거? 
     while ((recvSize = recv(client, buffer, sizeof(buffer) - 1, 0)) > 0) {
         buffer[recvSize] = '\0';
 

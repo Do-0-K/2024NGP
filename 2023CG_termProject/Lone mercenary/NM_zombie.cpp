@@ -95,6 +95,15 @@ NM_zombie::NM_zombie(float hp, float max, float spd, float def, float atk, int t
 		leg[0] = new NM_Mesh("obj_source\\zombie\\NM_zombie\\NM_zombie_leftleg.obj", "obj_source\\zombie\\NM_zombie\\bomb_zombie.png", 1024, 1024);
 		leg[1] = new NM_Mesh("obj_source\\zombie\\NM_zombie\\NM_zombie_rightleg.obj", "obj_source\\zombie\\NM_zombie\\bomb_zombie.png", 1024, 1024);
 		break;
+	case 사람:
+		// 사람 텍스쳐로 바꾸자
+		head = new NM_Mesh("obj_source\\zombie\\NM_zombie\\NM_zombie_head.obj", "obj_source\\zombie\\NM_zombie\\head_colorBase_opp.png", 1024, 1024);
+		body = new NM_Mesh("obj_source\\zombie\\NM_zombie\\NM_zombie_body.obj", "obj_source\\zombie\\NM_zombie\\body_colorBase_opp.png", 1024, 1024);
+		arm[0] = new NM_Mesh("obj_source\\zombie\\NM_zombie\\NM_zombie_leftarm.obj", "obj_source\\zombie\\NM_zombie\\leftarm_colorBase_opp.png", 1024, 1024);
+		arm[1] = new NM_Mesh("obj_source\\zombie\\NM_zombie\\NM_zombie_rightarm.obj", "obj_source\\zombie\\NM_zombie\\rightarm_colorBase_opp.png", 1024, 1024);
+		leg[0] = new NM_Mesh("obj_source\\zombie\\NM_zombie\\NM_zombie_leftleg.obj", "obj_source\\zombie\\NM_zombie\\leftleg_colorBase_test.png", 1024, 1024);
+		leg[1] = new NM_Mesh("obj_source\\zombie\\NM_zombie\\NM_zombie_rightleg.obj", "obj_source\\zombie\\NM_zombie\\rightleg_colorBase_test.png", 1024, 1024);
+		break;
 	}
 	head->init_scale(0.15);
 	body->init_scale(0.15);
@@ -188,6 +197,23 @@ void NM_zombie::walk_ani(int n)
 	if(glm::distance(cur_loc, p_pos) < 3)
 		cur_loc -= (speed * way) / 60.0f;
 
+	head->setLoc(cur_loc);
+	head->setRot(cur_rot);
+	body->setLoc(cur_loc);
+	body->setRot(cur_rot);
+	arm[0]->setLoc(cur_loc);
+	arm[0]->setRot(cur_rot);
+	arm[1]->setLoc(cur_loc);
+	arm[1]->setRot(cur_rot);
+	leg[0]->setLoc(cur_loc);
+	leg[0]->setRot(cur_rot);
+	leg[1]->setLoc(cur_loc);
+	leg[1]->setRot(cur_rot);
+}
+
+// opposite용 행렬 업데이트 함수
+void NM_zombie::UpdateMatrix()
+{
 	head->setLoc(cur_loc);
 	head->setRot(cur_rot);
 	body->setLoc(cur_loc);

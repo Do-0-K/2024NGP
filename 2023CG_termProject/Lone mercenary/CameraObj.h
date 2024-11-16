@@ -16,6 +16,7 @@ public:
 
 	glm::vec3 getEYE();
 	glm::vec3 getAT();
+	glm::vec2 getAngle();
 protected:
 private:
 	ShaderProgram* shader;
