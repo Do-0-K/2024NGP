@@ -5,7 +5,34 @@
 #pragma once
 #include "stdafx.h"
 
-class TCPServer {
+struct ObjectInfo
+{
+    int HP;
+    glm::vec3 Pos;
+    glm::vec2 Rot;
+
+};
+struct PlayerInfo
+{
+    glm::vec3 cameraEYE;
+    glm::vec2 Angle;
+
+};
+struct RenderInfo 
+{
+    int HP;
+    int ammo;
+    PlayerInfo opposite;
+    ObjectInfo alive_enemy[14];
+    int alive_num;
+    ObjectInfo box;
+    int remainTime;
+
+};
+
+
+class TCPServer 
+{
 public:
     TCPServer();
     ~TCPServer();
@@ -20,9 +47,9 @@ private:
     std::vector<SOCKET> client_sockets;
     std::vector<HANDLE> client_threads;
     int clientCount = 0;  // 클라이언트 수를 추적하기 위한 멤버 변수 추가
+    struct sockaddr_in serveraddr;
+    int addrlen;
 
-
-    int clientCount = 0;
     void AcceptClients();
     static DWORD WINAPI ClientThread(LPVOID clientSocket);
 };
