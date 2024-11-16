@@ -114,12 +114,14 @@ void MainApp::next_state()
 			MouseFunc::s_x = -1;
 			MouseFunc::s_y = -1;
 
-			ready_state = 1; //완료 변수
-			// 여기서 한번 서버한테 완료 메시지 보내기
-			retval = send(*m_pSock, (char*)&ready_state, sizeof(int), 0);
+			//ready_state = 1; //완료 변수
+			//// 여기서 한번 서버한테 완료 메시지 보내기
+			//retval = send(*m_pSock, (char*)&ready_state, sizeof(int), 0);
+			// 우리 완료 메시지 안쓰기로 했잖니 도영아
 		}
 		break;
 	case 필드:
+		// 여기 if문은 바뀐게 없네
 		if (mPlayer->Death_check() || Allkill_check() || game_timer->getremaining() == 0) {
 			glutSetCursor(GLUT_CURSOR_RIGHT_ARROW);
 			game_state = 결과창;
@@ -214,6 +216,7 @@ bool MainApp::e_arrayReady()
 		enemy_array.clear();
 		std::cout << "Current List size: " << enemy_array.size() << std::endl;
 	}
+	// 이건 잘 알아챘네
 	enemy_array.reserve(14);
 	for (int i = 0; i < 14; ++i) {
 		enemy_array.push_back(new NM_zombie(1200, 1350, 20, 30, 27, 일반));
