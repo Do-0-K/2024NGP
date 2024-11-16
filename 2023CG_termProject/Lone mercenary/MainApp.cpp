@@ -113,10 +113,6 @@ void MainApp::next_state()
 			mSound->play_fieldbgm();
 			MouseFunc::s_x = -1;
 			MouseFunc::s_y = -1;
-
-			ready_state = 1; //완료 변수
-			// 여기서 한번 서버한테 완료 메시지 보내기
-			retval = send(*m_pSock, (char*)&ready_state, sizeof(int), 0);
 		}
 		break;
 	case 필드:
