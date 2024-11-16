@@ -11,6 +11,7 @@ public:
 
 	void Update_1();
 	void Render();
+	void SetTotalscore(int score);
 
 private:
 	CubeMap* mCubemap;

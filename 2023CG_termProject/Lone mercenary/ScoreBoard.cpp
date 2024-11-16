@@ -87,16 +87,6 @@ void ScoreBoard::Update_1()
 {
 	camera->setCameraAngle(glm::vec2(0, 0));
 	camera->setCameraEYE(glm::vec3(0, 0, 0));
-	for (int i = 0; i < list.size(); ++i) {
-		if (list[i]->Death_check()) {
-			totalscore += 100;
-			killcnt++;
-		}
-	}
-	int re_time = mTimer->getremaining();
-	totalscore += (re_time * 50);
-	if (killcnt == MAX_ZOMBIE)		// 올킬 보너스 60은 바꿔주자
-		totalscore += 2000;
 
 	switch (totalscore / 10000) {
 	case 0:
@@ -284,4 +274,9 @@ void ScoreBoard::Render()
 	rhk->Render();
 
 	glDisable(GL_BLEND);
+}
+
+void ScoreBoard::SetTotalscore(int score)
+{
+	totalscore = score;
 }
