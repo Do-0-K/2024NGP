@@ -6,6 +6,25 @@ struct PlayerInfo {
     glm::vec2 Angle;
 };
 #pragma pack()
+struct ObjectInfo
+{
+    int HP;
+    glm::vec3 Pos;
+    glm::vec2 Rot;
+
+};
+
+struct RenderInfo
+{
+    int HP;
+    int ammo;
+    PlayerInfo opposite;
+    ObjectInfo alive_enemy[14];
+    int alive_num;
+    ObjectInfo box;
+    int remainTime;
+
+};
 
 TCPServer::TCPServer()
 {
@@ -67,15 +86,18 @@ void TCPServer::Execute() {
 // 이렇게 하면 소켓 살아있나요?
 void TCPServer::AcceptClients() {
     struct sockaddr_in clientaddr;
-    int addrlen;
+    int addrlen = sizeof(clientaddr);  // Initialize addrlen to the size of sockaddr_in
     while (clientCount < 2) {  // Accept only two clients
         // 이거 남아있는지 확인이 필요한데
         SOCKET clientSocket = accept(listen_sock, (struct sockaddr*)&clientaddr, &addrlen);
-        if (clientSocket == INVALID_SOCKET) {
-            std::cout << "Accept failed." << std::endl;
+
+            if (clientSocket == INVALID_SOCKET) {
+            std::cout << "Accept failed: " << WSAGetLastError() << std::endl;
             continue;
         }
-        std::cout << "Client connected." << std::endl;
+
+        std::cout << "Client connected. Address: " << inet_ntoa(clientaddr.sin_addr)
+                  << ", Port: " << ntohs(clientaddr.sin_port) << std::endl;
 
         client_sockets.push_back(clientSocket);
         HANDLE clientThread = CreateThread(NULL, 0, ClientThread, (LPVOID)clientSocket, 0, NULL);
@@ -96,32 +118,21 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID clientSocket) {
     int recvSize;
 
     // PlayerInfo 받는게 안에 있는데 버퍼에는 뭘 받는거? 
-    while ((recvSize = recv(client, buffer, sizeof(buffer) - 1, 0)) > 0) {
-        buffer[recvSize] = '\0';
+    while (true) {
+        // Receive PlayerInfo structure from client
+        recvSize = recv(client, (char*)&playerinfo, sizeof(playerinfo), 0);
+        if (recvSize <= 0) {
+            std::cout << "Client disconnected or error occurred. Closing connection." << std::endl;
+            break;
+        }
 
-        // Display received vec3 position data from client
-        std::cout << "Received vec3 position from client: " << buffer << std::endl;
-
-        // Echo the data back to the client
-        //send(client, buffer, recvSize, 0);
-        recv(client, (char*)&playerinfo, sizeof(playerinfo), 0);
+        // Print received PlayerInfo
+        std::cout << "Received PlayerInfo: " << std::endl;
+        std::cout << "  cameraEYE: (" << playerinfo.cameraEYE.x << ", "
+            << playerinfo.cameraEYE.y << ", " << playerinfo.cameraEYE.z << ")" << std::endl;
+        std::cout << "  Angle: (" << playerinfo.Angle.x << ", " << playerinfo.Angle.y << ")" << std::endl;
     }
-    //glm::vec3 position;
-    //int recvSize;
 
-    //while ((recvSize = recv(client, reinterpret_cast<char*>(&position), sizeof(position), 0)) > 0) {
-    //    // Display the received x, y, and z values
-    //    std::cout << "Received vec3 position from client: "
-    //        << "x = " << position.x << ", "
-    //        << "y = " << position.y << ", "
-    //        << "z = " << position.z << std::endl;
-
-    //   
-    //    send(client, reinterpret_cast<const char*>(&position), sizeof(position), 0);
-    //}
-
-
-    std::cout << "Client disconnected." << std::endl;
     closesocket(client);
     return 0;
 }

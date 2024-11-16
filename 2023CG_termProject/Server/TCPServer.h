@@ -5,30 +5,7 @@
 #pragma once
 #include "stdafx.h"
 
-struct ObjectInfo
-{
-    int HP;
-    glm::vec3 Pos;
-    glm::vec2 Rot;
 
-};
-struct PlayerInfo
-{
-    glm::vec3 cameraEYE;
-    glm::vec2 Angle;
-
-};
-struct RenderInfo 
-{
-    int HP;
-    int ammo;
-    PlayerInfo opposite;
-    ObjectInfo alive_enemy[14];
-    int alive_num;
-    ObjectInfo box;
-    int remainTime;
-
-};
 
 
 class TCPServer 
