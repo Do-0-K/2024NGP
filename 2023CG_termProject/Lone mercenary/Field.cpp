@@ -40,7 +40,7 @@ void Field::Update()
 {
 	// 플레이어 아이템 적용
 	dynamic_cast<Player*>(mPlayer)->apply_item();
-	//  업데이트 헤더에서 애니메이션 적용하기
+	// 업데이트 헤더에서 애니메이션 적용하기
 	dynamic_cast<Player*>(mPlayer)->animation();
 	dynamic_cast<Player*>(mPlayer)->attack(enemy_list, mCamera);
 	mCamera->setCameraEYE(dynamic_cast<Player*>(mPlayer)->getLoc());		// 카메라 업데이트 해주기
@@ -70,7 +70,7 @@ void Field::Update()
 	m_pOpposite->setLoc(oppEYE);
 	m_pOpposite->setRot(oppAngle);
 
-
+	m_pOpposite->UpdateMatrix();
 
 	// 서버에서 받을 예정, 준비 되면 삭제
 	//===========================================================

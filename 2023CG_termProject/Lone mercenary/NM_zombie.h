@@ -16,6 +16,7 @@ public:
 
 	void walk_ani(int n);
 	void setHit(bool);
+	void UpdateMatrix();
 
 	void z_heal(std::vector<EnemyBase*>&);
 	void z_boom();
