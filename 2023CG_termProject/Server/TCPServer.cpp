@@ -58,9 +58,10 @@ void TCPServer::Execute() {
 }
 
 void TCPServer::AcceptClients() {
-    int clientCount = 0;
+    struct sockaddr_in clientaddr;
+    int addrlen;
     while (clientCount < 2) {  // Accept only two clients
-        SOCKET clientSocket = accept(listen_sock, NULL, NULL);
+        SOCKET clientSocket = accept(listen_sock, (struct sockaddr*)&clientaddr, &addrlen);
         if (clientSocket == INVALID_SOCKET) {
             std::cout << "Accept failed." << std::endl;
             continue;
@@ -79,6 +80,7 @@ void TCPServer::AcceptClients() {
 }
 
 DWORD WINAPI TCPServer::ClientThread(LPVOID clientSocket) {
+    PlayerInfo playerinfo;
     SOCKET client = (SOCKET)clientSocket;
     char buffer[1024];
     int recvSize;
@@ -90,7 +92,8 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID clientSocket) {
         std::cout << "Received vec3 position from client: " << buffer << std::endl;
 
         // Echo the data back to the client
-        send(client, buffer, recvSize, 0);
+        //send(client, buffer, recvSize, 0);
+        recv(client, (char*)&playerinfo, sizeof(playerinfo), 0);
     }
     //glm::vec3 position;
     //int recvSize;
@@ -102,7 +105,7 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID clientSocket) {
     //        << "y = " << position.y << ", "
     //        << "z = " << position.z << std::endl;
 
-    //    // Echo the data back to the client (optional)
+    //   
     //    send(client, reinterpret_cast<const char*>(&position), sizeof(position), 0);
     //}
 
