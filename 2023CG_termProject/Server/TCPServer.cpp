@@ -26,6 +26,7 @@ struct RenderInfo
 
 };
 
+
 TCPServer::TCPServer()
 {
 
@@ -89,7 +90,7 @@ void TCPServer::Execute() {
 void TCPServer::AcceptClients() {
     struct sockaddr_in clientaddr;
     int addrlen = sizeof(clientaddr);  // Initialize addrlen to the size of sockaddr_in
-    while (clientCount < 1) {  // Accept only two clients
+    while (clientCount < 2) {  // Accept only two clients
         // 이거 남아있는지 확인이 필요한데
         SOCKET clientSocket = accept(listen_sock, (struct sockaddr*)&clientaddr, &addrlen);
 
@@ -113,10 +114,10 @@ void TCPServer::AcceptClients() {
 }
 
 // 이건 아직 미완이죠?
+// 인자에 다른 클라이언트의 playerinfo를 받을 수 있게 구조체를 해야됨. 
 DWORD WINAPI TCPServer::ClientThread(LPVOID clientSocket) {
     PlayerInfo playerinfo;
     SOCKET client = (SOCKET)clientSocket;
-    char buffer[1024];
     int recvSize;
 
     // PlayerInfo 받는게 안에 있는데 버퍼에는 뭘 받는거? 
@@ -133,7 +134,7 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID clientSocket) {
         std::cout << "  cameraEYE: (" << playerinfo.cameraEYE.x << ", "
             << playerinfo.cameraEYE.y << ", " << playerinfo.cameraEYE.z << ")" << std::endl;
         std::cout << "  Angle: (" << playerinfo.Angle.x << ", " << playerinfo.Angle.y << ")" << std::endl;
-        send(client, (char*)&playerinfo, sizeof(playerinfo), 0);
+        send(client, (char*)&playerinfo, sizeof(playerinfo), 0);        //send other client opposite
     }
 
     closesocket(client);
