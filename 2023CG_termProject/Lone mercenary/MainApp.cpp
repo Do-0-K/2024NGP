@@ -187,7 +187,7 @@ void MainApp::MainAppConnect()
 	// 알아낸 IP를 set해주기
 	memcpy(&serveraddr.sin_addr, ptr->h_addr_list[0], ptr->h_length);
 
-	serveraddr.sin_port = htons(1111);	// 포트번호 정해지면 수정
+	serveraddr.sin_port = htons(25715);	// 포트번호 정해지면 수정
 	retval = connect(*m_pSock, (sockaddr*)&serveraddr, sizeof(serveraddr));
 	if (retval == SOCKET_ERROR) err_quit("connect()");
 

@@ -51,6 +51,7 @@ void TCPServer::BindAndListen() {
 
     char hostName[256];
     gethostname(hostName, sizeof(hostName));
+    std::cout << hostName << std::endl;
 
     hostent* ptr = gethostbyname(hostName);
     memcpy(&serverAddr.sin_addr, ptr->h_addr_list[0], ptr->h_length);
@@ -81,13 +82,14 @@ void TCPServer::Execute() {
     std::cout << "Waiting for clients to connect..." << std::endl;
     AcceptClients();
     // 이 함수 두명 받으면 끝인데 서버 유지 되나요?
+    while (1);
 }
 
 // 이렇게 하면 소켓 살아있나요?
 void TCPServer::AcceptClients() {
     struct sockaddr_in clientaddr;
     int addrlen = sizeof(clientaddr);  // Initialize addrlen to the size of sockaddr_in
-    while (clientCount < 2) {  // Accept only two clients
+    while (clientCount < 1) {  // Accept only two clients
         // 이거 남아있는지 확인이 필요한데
         SOCKET clientSocket = accept(listen_sock, (struct sockaddr*)&clientaddr, &addrlen);
 
@@ -120,7 +122,7 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID clientSocket) {
     // PlayerInfo 받는게 안에 있는데 버퍼에는 뭘 받는거? 
     while (true) {
         // Receive PlayerInfo structure from client
-        recvSize = recv(client, (char*)&playerinfo, sizeof(playerinfo), 0);
+        recvSize = recv(client, (char*)&playerinfo, sizeof(playerinfo), MSG_WAITALL);
         if (recvSize <= 0) {
             std::cout << "Client disconnected or error occurred. Closing connection." << std::endl;
             break;
@@ -131,6 +133,7 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID clientSocket) {
         std::cout << "  cameraEYE: (" << playerinfo.cameraEYE.x << ", "
             << playerinfo.cameraEYE.y << ", " << playerinfo.cameraEYE.z << ")" << std::endl;
         std::cout << "  Angle: (" << playerinfo.Angle.x << ", " << playerinfo.Angle.y << ")" << std::endl;
+        send(client, (char*)&playerinfo, sizeof(playerinfo), 0);
     }
 
     closesocket(client);
