@@ -49,8 +49,13 @@ void Field::Update()
 	
 	PlayerInfo playerInfo{ mCamera->getEYE(), mCamera->getAngle() };
 	// 내 위치 보내기
-	send(*m_pSock, (char*)&playerInfo, sizeof(playerInfo), 0);
+	
+	int retval = send(*m_pSock, (char*)&playerInfo, sizeof(playerInfo), 0);
 
+	if (retval == 0) {
+		std::cout << "전송 실패" << std::endl;
+		exit(1);
+	}
 	
 	// 총기 위치 변경
 	dynamic_cast<Player*>(mPlayer)->take_out_Wep();
@@ -60,8 +65,11 @@ void Field::Update()
 	dynamic_cast<Player*>(mPlayer)->knife_AT_ani();
 
 	RenderInfo renderInfo;
-	recv(*m_pSock, (char*)&renderInfo, sizeof(RenderInfo), MSG_WAITALL);
-
+	retval = recv(*m_pSock, (char*)&renderInfo, sizeof(RenderInfo), MSG_WAITALL);
+	if (retval == 0) {
+		std::cout << "받은 정보가 없음" << std::endl;
+		exit(1);
+	}
 	// 옳바른 각으로 회전하는지 확인 필요
 	glm::vec3 oppEYE = renderInfo.opposite.cameraEYE;
 	glm::vec2 oppAngle = renderInfo.opposite.Angle;
