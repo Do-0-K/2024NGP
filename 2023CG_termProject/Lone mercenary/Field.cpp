@@ -2,18 +2,30 @@
 #include "Player.h"
 #include "NM_zombie.h"
 
+#pragma pack(1)
+struct PlayerInfo {
+	glm::vec3 cameraEYE;
+	glm::vec2 Angle;
+};
+
+struct RenderInfo {
+	PlayerInfo opposite;
+};
+#pragma pack()
+
 int Field::first_zom = 0;
 
-Field::Field(CharacterBase* t_player, FieldMap* t_field, CameraObj* t_camera, std::vector<EnemyBase*>& t_list, GameTimer* t_timer, CubeMap* t_cube)
+Field::Field(CharacterBase* t_player, FieldMap* t_field, CameraObj* t_camera, std::vector<EnemyBase*>& t_list, GameTimer* t_timer, CubeMap* t_cube, std::shared_ptr<SOCKET>& pSock)
 	: mPlayer(t_player), mField(t_field), mCamera(t_camera), enemy_list(t_list), mTimer(t_timer), mCubemap(t_cube)
 {
+	m_pSock = pSock;
 	first_zom = 0;
 	mUi = new UI(mPlayer, mTimer);
 	max_alive = 14;
 	item = new ItemBox(mTimer, mPlayer);
-	sandglass[0] = new Timerplus(mPlayer, mTimer, glm::vec3(-100, 0, 20));
-	sandglass[1] = new Timerplus(mPlayer, mTimer, glm::vec3(20, 0, -100));
-	sandglass[2] = new Timerplus(mPlayer, mTimer, glm::vec3(-20, 0, 70));
+
+	m_pOpposite = std::make_unique<NM_zombie>(100, 100, 100, 100, 100, 사람);
+
 }
 
 Field::~Field()
@@ -22,20 +34,28 @@ Field::~Field()
 	mPlayer = nullptr;
 	mField = nullptr;
 	delete item;
-	for (int i = 0; i < 3; ++i)
-		delete sandglass[i];
 }
 
 void Field::Update()
 {
 	// 플레이어 아이템 적용
 	dynamic_cast<Player*>(mPlayer)->apply_item();
-	//  업데이트 헤더에서 애니메이션 적용하기
+	// 업데이트 헤더에서 애니메이션 적용하기
 	dynamic_cast<Player*>(mPlayer)->animation();
 	dynamic_cast<Player*>(mPlayer)->attack(enemy_list, mCamera);
 	mCamera->setCameraEYE(dynamic_cast<Player*>(mPlayer)->getLoc());		// 카메라 업데이트 해주기
 	mCamera->setCameraAngle(dynamic_cast<Player*>(mPlayer)->getRot());
 	// 여기서 서버에게 위치랑 필요한거 넘기기
+	
+	PlayerInfo playerInfo{ mCamera->getEYE(), mCamera->getAngle() };
+	// 내 위치 보내기
+	
+	int retval = send(*m_pSock, (char*)&playerInfo, sizeof(playerInfo), 0);
+
+	if (retval == 0) {
+		std::cout << "전송 실패" << std::endl;
+		exit(1);
+	}
 	
 	// 총기 위치 변경
 	dynamic_cast<Player*>(mPlayer)->take_out_Wep();
@@ -44,6 +64,21 @@ void Field::Update()
 	dynamic_cast<Player*>(mPlayer)->reload_ani();
 	dynamic_cast<Player*>(mPlayer)->knife_AT_ani();
 
+	RenderInfo renderInfo;
+	retval = recv(*m_pSock, (char*)&renderInfo, sizeof(RenderInfo), MSG_WAITALL);
+	if (retval == 0) {
+		std::cout << "받은 정보가 없음" << std::endl;
+		exit(1);
+	}
+	// 옳바른 각으로 회전하는지 확인 필요
+	glm::vec3 oppEYE = renderInfo.opposite.cameraEYE;
+	glm::vec2 oppAngle = renderInfo.opposite.Angle;
+	oppEYE.y = 0; oppAngle.y = 0;
+	
+	m_pOpposite->setLoc(oppEYE);
+	m_pOpposite->setRot(oppAngle);
+
+	m_pOpposite->UpdateMatrix();
 
 	// 서버에서 받을 예정, 준비 되면 삭제
 	//===========================================================
@@ -63,8 +98,8 @@ void Field::Update()
 	}
 
 
-
-	for (int i = 0; i < alive; ++i) {
+	// 좀비의 움직임, 지금은 비활성
+	/*for (int i = 0; i < alive; ++i) {
 		aliveEnemy[i]->setPlayerLoc(mPlayer);
 		if (dynamic_cast<NM_zombie*>(aliveEnemy[i])->getlarm()->collision_check(*mField->gethouse_1())
 			|| dynamic_cast<NM_zombie*>(aliveEnemy[i])->getlarm()->collision_check(*mField->gethouse_2())
@@ -77,17 +112,8 @@ void Field::Update()
 		aliveEnemy[i]->attack();
 		dynamic_cast<NM_zombie*>(aliveEnemy[i])->z_heal(enemy_list);
 		dynamic_cast<NM_zombie*>(aliveEnemy[i])->z_boom();
-	}
+	}*/
 	//==============================================================================
-
-
-	// 모래시계? 제거 예정
-	//====================================================
-	for (Timerplus*& t : sandglass) {
-		t->check_collision();
-		t->rot_ani();
-	}
-	//======================================================
 
 	// 서버가 아이템 박스 관리
 	//===================================================
@@ -120,8 +146,7 @@ void Field::Render()
 		else
 			break;
 	}
-	for (Timerplus*& t : sandglass)
-		t->Render();
+	m_pOpposite->Render();
 	item->Render();
 	mUi->Render();
 }

@@ -36,6 +36,7 @@ bool MainApp::Initialize()
 	pKeyboard->setScene(current_scene);
 
 	// 게임 요소 초기화
+	MainAppConnect();
 
 	return true;
 }
@@ -103,7 +104,7 @@ void MainApp::next_state()
 			delete current_scene;
 			e_arrayReady();
 			game_timer = new GameTimer(mPlayer);
-			current_scene = new Field(mPlayer, field, camera, enemy_array, game_timer, cubemap);
+			current_scene = new Field(mPlayer, field, camera, enemy_array, game_timer, cubemap, m_pSock);
 			score_scene = new ScoreBoard(cubemap, enemy_array, game_timer, camera);
 			pKeyboard->setGame_stete(game_state);
 			pKeyboard->setScene(current_scene);
@@ -113,9 +114,15 @@ void MainApp::next_state()
 			mSound->play_fieldbgm();
 			MouseFunc::s_x = -1;
 			MouseFunc::s_y = -1;
+
+			//ready_state = 1; //완료 변수
+			//// 여기서 한번 서버한테 완료 메시지 보내기
+			//retval = send(*m_pSock, (char*)&ready_state, sizeof(int), 0);
+			// 우리 완료 메시지 안쓰기로 했잖니 도영아
 		}
 		break;
 	case 필드:
+		// 여기 if문은 바뀐게 없네
 		if (mPlayer->Death_check() || Allkill_check() || game_timer->getremaining() == 0) {
 			glutSetCursor(GLUT_CURSOR_RIGHT_ARROW);
 			game_state = 결과창;
@@ -173,17 +180,28 @@ void MainApp::MainAppConnect()
 	serveraddr.sin_family = AF_INET;
 
 	// 호스트의 IP 주소를 알아내기
-	const char* hostName = "";// 서버로 사용할 호스트 이름
+	const char* hostName = "DESKTOP-SNG2JRJ";// 서버로 사용할 호스트 이름
 	hostent* ptr = gethostbyname(hostName);
-	if (ptr == nullptr)err_quit("gethostname()");
-	//보여 경환?
+	if (ptr == nullptr) {
+		std::cout << "can't find Hostname" << std::endl;
+		exit(1);
+	}
+	//const char* cc = "25.30.142.137";
 
 	// 알아낸 IP를 set해주기
+	//inet_pton(AF_INET, cc, &serveraddr.sin_addr);
 	memcpy(&serveraddr.sin_addr, ptr->h_addr_list[0], ptr->h_length);
 
-	serveraddr.sin_port = htons(1111);	// 포트번호 정해지면 수정
+	char test[22];
+	inet_ntop(AF_INET, &serveraddr.sin_addr, test, sizeof(test));
+	std::cout << test << std::endl;
+
+	serveraddr.sin_port = htons(25715);	// 포트번호 정해지면 수정
 	retval = connect(*m_pSock, (sockaddr*)&serveraddr, sizeof(serveraddr));
-	if (retval == SOCKET_ERROR) err_quit("connect()");
+	if (retval == SOCKET_ERROR) {
+		std::cout << "connect Failed" << std::endl;
+		exit(1);
+	}
 
 }
 
@@ -210,6 +228,7 @@ bool MainApp::e_arrayReady()
 		enemy_array.clear();
 		std::cout << "Current List size: " << enemy_array.size() << std::endl;
 	}
+	// 이건 잘 알아챘네
 	enemy_array.reserve(14);
 	for (int i = 0; i < 14; ++i) {
 		enemy_array.push_back(new NM_zombie(1200, 1350, 20, 30, 27, 일반));

@@ -153,9 +153,6 @@
     <ClCompile Include="Enemy.cpp">
       <Filter>소스 파일\Player, Item, Enemy\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="Field.cpp">
-      <Filter>소스 파일\Scene\필드</Filter>
-    </ClCompile>
     <ClCompile Include="Select_Item.cpp">
       <Filter>소스 파일\Scene\아이템선택</Filter>
     </ClCompile>
@@ -182,6 +179,9 @@
     </ClCompile>
     <ClCompile Include="Sound.cpp">
       <Filter>소스 파일\Fmod sound</Filter>
+    </ClCompile>
+    <ClCompile Include="Field.cpp">
+      <Filter>소스 파일\Scene\필드</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
