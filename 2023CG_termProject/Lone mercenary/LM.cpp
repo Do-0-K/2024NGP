@@ -14,7 +14,6 @@ GLvoid Reshape(int w, int h);
 int width, height;			// 종횡 크기
 double frameTime;			// 출력 시간
 
-
 void Timer(int);			// 타이머 요소
 
 MainApp* mainApp;			// MainApp 포인터

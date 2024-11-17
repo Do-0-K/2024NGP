@@ -36,6 +36,7 @@ bool MainApp::Initialize()
 	pKeyboard->setScene(current_scene);
 
 	// 게임 요소 초기화
+	MainAppConnect();
 
 	return true;
 }
@@ -181,15 +182,20 @@ void MainApp::MainAppConnect()
 	// 호스트의 IP 주소를 알아내기
 	const char* hostName = "";// 서버로 사용할 호스트 이름
 	hostent* ptr = gethostbyname(hostName);
-	if (ptr == nullptr)err_quit("gethostname()");
-	//보여 경환?
+	if (ptr == nullptr) {
+		std::cout << "can't find Hostname" << std::endl;
+		exit(1);
+	}
 
 	// 알아낸 IP를 set해주기
 	memcpy(&serveraddr.sin_addr, ptr->h_addr_list[0], ptr->h_length);
 
 	serveraddr.sin_port = htons(1111);	// 포트번호 정해지면 수정
 	retval = connect(*m_pSock, (sockaddr*)&serveraddr, sizeof(serveraddr));
-	if (retval == SOCKET_ERROR) err_quit("connect()");
+	if (retval == SOCKET_ERROR) {
+		std::cout << "connect Failed" << std::endl;
+		exit(1);
+	}
 
 }
 
