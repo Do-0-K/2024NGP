@@ -5,17 +5,16 @@
 #pragma once
 #include "stdafx.h"
 
+struct ThreadArg {
+    SOCKET clientSocket;
+    int clientIndex; // To track the client's index in client_sockets
+};
 
-
-
-class TCPServer 
+class TCPServer
 {
 public:
     TCPServer();
     ~TCPServer();
-    void Update();
-    void Collision_Check();
-    DWORD WINAPI Client_Thread(LPVOID args);
     void BindAndListen();
     void Execute();
 
@@ -23,10 +22,10 @@ private:
     SOCKET listen_sock = NULL;
     std::vector<SOCKET> client_sockets;
     std::vector<HANDLE> client_threads;
-    int clientCount = 0;  // 클라이언트 수를 추적하기 위한 멤버 변수 추가
+    int clientCount = 0;
     struct sockaddr_in serveraddr;
     int addrlen;
 
     void AcceptClients();
-    static DWORD WINAPI ClientThread(LPVOID clientSocket);
+    static DWORD WINAPI ClientThread(LPVOID arg);
 };
