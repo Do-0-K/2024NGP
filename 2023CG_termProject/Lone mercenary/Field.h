@@ -4,6 +4,7 @@
 #include "FieldMap.h"
 #include "Enemy.h"
 #include "CameraObj.h"
+#include "ProjObj.h"
 #include "GameTimer.h"
 #include "CubeMap.h"
 #include "UI.h"
@@ -13,7 +14,7 @@
 
 class Field : public Scene {
 public:
-	Field(CharacterBase*, FieldMap*, CameraObj*, std::vector<EnemyBase*>&, GameTimer*, CubeMap*, std::shared_ptr<SOCKET>& pSock);
+	Field(CharacterBase*, FieldMap*, CameraObj*, ProjObj*, std::vector<EnemyBase*>&, GameTimer*, CubeMap*, std::shared_ptr<SOCKET>& pSock);
 	~Field();
 
 	CharacterBase* getPlayer();
@@ -26,6 +27,9 @@ public:
 
 	bool check_zomcol(EnemyBase* [], int);
 
+	void ProcessInput();
+	void togleMinimap();
+
 	void Update();
 	void Render();
 private:
@@ -34,6 +38,7 @@ private:
 	CubeMap* mCubemap;
 	std::vector<EnemyBase*> enemy_list;
 	CameraObj* mCamera{ nullptr };
+	ProjObj* m_pProj{ nullptr };
 	GameTimer* mTimer{ nullptr };
 	UI* mUi;
 	ItemBox* item;
@@ -43,4 +48,8 @@ private:
 	int aliving{};		// 한 필드에 존재하는 좀비 수
 
 	std::shared_ptr<SOCKET> m_pSock;	// 클라이언트 소켓
+
+	bool m_bShowMinimap = false;
+	glm::vec3 tempOppEYE{ 0.0, 0.0, 0.0 };
+	glm::vec2 tempOppAngle{ 0.0, 0.0 };
 };

@@ -15,8 +15,8 @@ struct RenderInfo {
 
 int Field::first_zom = 0;
 
-Field::Field(CharacterBase* t_player, FieldMap* t_field, CameraObj* t_camera, std::vector<EnemyBase*>& t_list, GameTimer* t_timer, CubeMap* t_cube, std::shared_ptr<SOCKET>& pSock)
-	: mPlayer(t_player), mField(t_field), mCamera(t_camera), enemy_list(t_list), mTimer(t_timer), mCubemap(t_cube)
+Field::Field(CharacterBase* t_player, FieldMap* t_field, CameraObj* t_camera, ProjObj* proj, std::vector<EnemyBase*>& t_list, GameTimer* t_timer, CubeMap* t_cube, std::shared_ptr<SOCKET>& pSock)
+	: mPlayer(t_player), mField(t_field), mCamera(t_camera), m_pProj(proj), enemy_list(t_list), mTimer(t_timer), mCubemap(t_cube)
 {
 	m_pSock = pSock;
 	first_zom = 0;
@@ -43,20 +43,21 @@ void Field::Update()
 	// 업데이트 헤더에서 애니메이션 적용하기
 	dynamic_cast<Player*>(mPlayer)->animation();
 	dynamic_cast<Player*>(mPlayer)->attack(enemy_list, mCamera);
-	mCamera->setCameraEYE(dynamic_cast<Player*>(mPlayer)->getLoc());		// 카메라 업데이트 해주기
-	mCamera->setCameraAngle(dynamic_cast<Player*>(mPlayer)->getRot());
 	// 여기서 서버에게 위치랑 필요한거 넘기기
-	
+
+	/*
 	PlayerInfo playerInfo{ mCamera->getEYE(), mCamera->getAngle() };
 	// 내 위치 보내기
-	
+
 	int retval = send(*m_pSock, (char*)&playerInfo, sizeof(playerInfo), 0);
 
 	if (retval == 0) {
 		std::cout << "전송 실패" << std::endl;
 		exit(1);
 	}
-	
+	*/
+	mCamera->setCameraEYE(dynamic_cast<Player*>(mPlayer)->getLoc());		// 카메라 업데이트 해주기
+	mCamera->setCameraAngle(dynamic_cast<Player*>(mPlayer)->getRot());
 	// 총기 위치 변경
 	dynamic_cast<Player*>(mPlayer)->take_out_Wep();
 	dynamic_cast<Player*>(mPlayer)->getWeapon()->setLoc(dynamic_cast<Player*>(mPlayer)->getLoc());
@@ -64,6 +65,7 @@ void Field::Update()
 	dynamic_cast<Player*>(mPlayer)->reload_ani();
 	dynamic_cast<Player*>(mPlayer)->knife_AT_ani();
 
+	/*
 	RenderInfo renderInfo;
 	retval = recv(*m_pSock, (char*)&renderInfo, sizeof(RenderInfo), MSG_WAITALL);
 	if (retval == 0) {
@@ -74,12 +76,17 @@ void Field::Update()
 	glm::vec3 oppEYE = renderInfo.opposite.cameraEYE;
 	glm::vec2 oppAngle = renderInfo.opposite.Angle;
 	oppEYE.y = 0; oppAngle.y = 0;
-	
+
 	m_pOpposite->setLoc(oppEYE);
 	m_pOpposite->setRot(oppAngle);
 
 	m_pOpposite->UpdateMatrix();
+	*/
 
+	m_pOpposite->setLoc(tempOppEYE);
+	m_pOpposite->setRot(tempOppAngle);
+
+	m_pOpposite->UpdateMatrix();
 	// 서버에서 받을 예정, 준비 되면 삭제
 	//===========================================================
 	int alive{};
@@ -124,8 +131,42 @@ void Field::Update()
 	mUi->Update();
 }
 
+// 상대 위치 테스트용 키 입력 함수
+void Field::ProcessInput()
+{
+	UCHAR keyBuffer[256];
+	GetKeyboardState(keyBuffer);
+	glm::vec3 dir = glm::vec3(glm::cos(glm::radians(tempOppAngle.x)), 0, glm::sin(glm::radians(tempOppAngle.x)));
+	if (keyBuffer[VK_UP] & 0x80) {
+		tempOppEYE += (dir * 1.0f);
+	}
+	if (keyBuffer[VK_DOWN] & 0x80) {
+		tempOppEYE -= (dir * 1.0f);
+	}
+	if (keyBuffer[VK_LEFT] & 0x80) {
+		tempOppAngle.x -= 3.0f;
+	}
+	if (keyBuffer[VK_RIGHT] & 0x80) {
+		tempOppAngle.x += 3.0f;
+	}
+}
+
+void Field::togleMinimap()
+{
+	if (m_bShowMinimap)
+		m_bShowMinimap = false;
+	else
+		m_bShowMinimap = true;
+}
+
 void Field::Render()
 {
+	ProcessInput();
+
+	glViewport(0, 0, 1280, 720);
+	m_pProj->setOrtho(false);
+	m_pProj->OutToShader();
+
 	mCubemap->Render();
 	mField->Render();
 	dynamic_cast<Player*>(mPlayer)->getWeapon()->Render();
@@ -149,6 +190,29 @@ void Field::Render()
 	m_pOpposite->Render();
 	item->Render();
 	mUi->Render();
+	if (m_bShowMinimap) {
+		glViewport(880, 320, 400, 400);
+		glm::vec3 skyLoc(0.0, 400.0, 0.0);
+		glm::vec2 skyRot(0.0, -90.0);
+
+		glm::vec3 oppEYE = mCamera->getEYE();
+		glm::vec2 oppAngle = mCamera->getAngle();
+		oppEYE.y = 0; oppAngle.y = 0;
+
+		mCamera->setCameraEYE(skyLoc);		// 카메라 업데이트 해주기
+		mCamera->setCameraAngle(skyRot);
+		m_pProj->setOrtho(true);
+		m_pProj->OutToShader();
+
+		mField->Render();
+
+		m_pOpposite->Render();
+		m_pOpposite->setLoc(oppEYE);
+		m_pOpposite->setRot(oppAngle);
+		m_pOpposite->UpdateMatrix();
+
+		m_pOpposite->Render();
+	}
 }
 
 CharacterBase* Field::getPlayer()

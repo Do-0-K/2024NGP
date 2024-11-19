@@ -36,7 +36,7 @@ bool MainApp::Initialize()
 	pKeyboard->setScene(current_scene);
 
 	// 게임 요소 초기화
-	MainAppConnect();
+	//MainAppConnect();
 
 	return true;
 }
@@ -104,7 +104,7 @@ void MainApp::next_state()
 			delete current_scene;
 			e_arrayReady();
 			game_timer = new GameTimer(mPlayer);
-			current_scene = new Field(mPlayer, field, camera, enemy_array, game_timer, cubemap, m_pSock);
+			current_scene = new Field(mPlayer, field, camera, proj, enemy_array, game_timer, cubemap, m_pSock);
 			score_scene = new ScoreBoard(cubemap, enemy_array, game_timer, camera);
 			pKeyboard->setGame_stete(game_state);
 			pKeyboard->setScene(current_scene);
