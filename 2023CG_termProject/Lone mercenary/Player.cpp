@@ -13,7 +13,7 @@
 
 //==========================Player===========================
 
-Player::Player(float hp, float max, float spd, float def, float atk)
+Player::Player(float hp, float max, float spd, float def, float atk, std::shared_ptr<SOCKET>& m_pSock)
 	: CharacterBase(hp, max, spd, def, atk)
 {
 	pistol = new Pistol("obj_source\\weapon\\pistol\\obj_pistol.obj", "obj_source\\weapon\\pistol\\texture_pistol.png", 1024, 1024, 10, 10, 250);
@@ -50,6 +50,8 @@ Player::Player(float hp, float max, float spd, float def, float atk)
 	angle = 0.0f;
 	type = 0;
 	bonus_atack = 0;
+
+	pSock = m_pSock;
 
 	mSound = MySound::GetInstance();
 }
@@ -1167,6 +1169,11 @@ glm::vec3 Player::RaytoPlaneYZ(glm::vec3 A, glm::vec3 B, float plane)
 	C.z = (A.z - B.z) * ratio + (B.z);
 	C.x = plane;
 	return C;
+}
+void Player::attack_send(int state)
+{
+	player_state = state; //상태 지정
+	int retval = send(*pSock, (char*)&player_state, sizeof(player_state), 0);
 }
 //===========================================================
 

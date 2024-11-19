@@ -87,7 +87,7 @@ void MainApp::next_state()
 		if (pMouse->next_state()) {
 			game_state = 아이템선택;
 			delete current_scene;
-			mPlayer = new Player(100, 200, 40, 20, 0);
+			mPlayer = new Player(100, 200, 40, 20, 0,m_pSock); //when make player, also make player's socket
 			current_scene = new Select_Item(mPlayer, cubemap);
 			pKeyboard->setGame_stete(game_state);
 			pKeyboard->setScene(current_scene);

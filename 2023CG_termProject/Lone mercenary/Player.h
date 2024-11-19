@@ -36,12 +36,15 @@ private:
 	Weapon* rifle;
 	Weapon* knife;
 
+	std::shared_ptr<SOCKET> pSock; //socket
+	int player_state; //상태를 나타내는 변수(공격x = 0, 공격o = 1)
+
 	MySound* mSound;
 
 protected:
 
 public:
-	Player(float hp, float max, float spd, float def, float atk);
+	Player(float hp, float max, float spd, float def, float atk, std::shared_ptr<SOCKET>& m_pSock);
 
 	// 애니메이션 함수 만들기
 	void animation();
@@ -63,6 +66,8 @@ public:
 	glm::vec3 RaytoPlaneXY(glm::vec3,glm::vec3,float);			// XY평면 투영
 	glm::vec3 RaytoPlaneXZ(glm::vec3,glm::vec3,float);			// XZ평면 투영
 	glm::vec3 RaytoPlaneYZ(glm::vec3,glm::vec3,float);			// YZ평면 투영
+
+	void attack_send(int); //send flag (attack or move)
 
 	glm::vec3 getLoc();				// 현재 위치 받아오기
 	glm::vec2 getRot();				// 현재 바라보는 방향 받아오기
