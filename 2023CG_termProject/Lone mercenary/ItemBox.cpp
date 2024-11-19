@@ -1,13 +1,10 @@
 #include "ItemBox.h"
 
-ItemBox::ItemBox(GameTimer* t_time, CharacterBase* t_play)
-	: timer(t_time), mPlayer(t_play)
+ItemBox::ItemBox(CharacterBase* t_play) : mPlayer(t_play)
 {
 	box = new Mesh("obj_source\\field\\item_box.obj", "obj_source\\field\\item_box.png", 1024, 1024);
 	box->init_scale(0.5);
 	exist = false;
-	remaining = 8;
-	l_time = clock();
 
 	mSound = MySound::GetInstance();
 }
@@ -15,7 +12,6 @@ ItemBox::ItemBox(GameTimer* t_time, CharacterBase* t_play)
 ItemBox::~ItemBox()
 {
 	delete box;
-	timer = nullptr;
 	mPlayer = nullptr;
 	mSound = nullptr;
 }
@@ -31,7 +27,6 @@ void ItemBox::check_collision()
 	if (exist) {
 		if (glm::distance(glm::vec3(dynamic_cast<Player*>(mPlayer)->getLoc().x , 0, dynamic_cast<Player*>(mPlayer)->getLoc().z), cur_loc) < 5) {
 			exist = false;
-			l_time = clock();
 			int heal = 2;
 			if (mPlayer->getHP() < 100) {
 				heal = 6;
@@ -57,19 +52,6 @@ void ItemBox::rot_ani()
 		if (cur_rot.x >= 360)
 			cur_rot.x -= 360;
 		box->setRot(cur_rot);
-	}
-}
-
-
-void ItemBox::check_time()
-{
-	if (not exist) {
-		i_time = clock();
-		int cc = static_cast<int>((i_time - l_time) / CLOCKS_PER_SEC);
-		if (cc >= remaining) {
-			exist = true;
-			setLoc();
-		}
 	}
 }
 

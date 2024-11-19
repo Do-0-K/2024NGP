@@ -10,28 +10,22 @@
 #include "Sound.h"
 class ItemBox {
 public:
-	ItemBox(GameTimer*, CharacterBase*);
+	ItemBox(CharacterBase*);
 	~ItemBox();
 
-	void check_collision();
-	void check_time();
+	void check_collision(); //클라에서 진행할지 생각을 해봐야할 듯
 	void setLoc();
 
 	void rot_ani();
 
 	void Render();
 private:
-	GameTimer* timer;
 	CharacterBase* mPlayer;
 	Mesh* box;
 
 	bool  exist;
 	glm::vec3 cur_loc;
 	glm::vec2 cur_rot;
-
-	int remaining;
-	clock_t i_time;
-	clock_t l_time;
 
 	MySound* mSound;
 };
