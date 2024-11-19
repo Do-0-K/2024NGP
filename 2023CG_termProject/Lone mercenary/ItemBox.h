@@ -14,7 +14,7 @@ public:
 	~ItemBox();
 
 	void check_collision(); //클라에서 진행할지 생각을 해봐야할 듯
-	void setLoc();
+	void setLoc(glm::vec3); //서버에서 받은 위치 set
 
 	void rot_ani();
 

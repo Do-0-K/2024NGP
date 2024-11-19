@@ -55,12 +55,7 @@ void ItemBox::rot_ani()
 	}
 }
 
-void ItemBox::setLoc()
+void ItemBox::setLoc(glm::vec3 pos) //서버에서 받은 박스 위치를 set
 {
-	std::random_device rd;
-	std::default_random_engine dre(rd());
-	std::uniform_int_distribution<int> uid(-45, 45);
-	cur_loc = glm::vec3(uid(dre), 0, uid(dre));
-	cur_rot = glm::vec2(0.0f);
-	box->setLoc(cur_loc);
+	cur_loc = pos;
 }

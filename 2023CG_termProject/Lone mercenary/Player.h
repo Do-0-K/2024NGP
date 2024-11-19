@@ -62,10 +62,11 @@ public:
 	void knife_AT_ani();
 	bool check_reload_ammo();
 
-	void attack_check(std::vector<EnemyBase*>&, CameraObj*);	// 광선이 좀비랑 닿았나?
-	glm::vec3 RaytoPlaneXY(glm::vec3,glm::vec3,float);			// XY평면 투영
-	glm::vec3 RaytoPlaneXZ(glm::vec3,glm::vec3,float);			// XZ평면 투영
-	glm::vec3 RaytoPlaneYZ(glm::vec3,glm::vec3,float);			// YZ평면 투영
+	//Player & Enemy 충돌은 서버에서 관리
+	//void attack_check(std::vector<EnemyBase*>&, CameraObj*);	// 광선이 좀비랑 닿았나?
+	//glm::vec3 RaytoPlaneXY(glm::vec3,glm::vec3,float);			// XY평면 투영
+	//glm::vec3 RaytoPlaneXZ(glm::vec3,glm::vec3,float);			// XZ평면 투영
+	//glm::vec3 RaytoPlaneYZ(glm::vec3,glm::vec3,float);			// YZ평면 투영
 
 	void attack_send(int); //send flag (attack or move)
 
