@@ -6,8 +6,11 @@ in vec3 FragPos;
 
 out vec4 FragColor;
 
+
+uniform float HPPercent;
 uniform vec3 veiwPos;
 uniform vec3 ambientLight;
+
 //uniform vec3 lightPos;		// 조명 위치
 //uniform vec3 lightColor;	// 조명의 색
 
@@ -42,5 +45,11 @@ void main()
 
 	FragColor = vec4(result, 1.0);
 	vec2 texCoord = PassTex.xy;
-	FragColor = texture(outTexture, texCoord) * FragColor;
+
+	vec4 texColor = texture(outTexture, texCoord);
+	vec4 redColor = vec4(1.0, 0.0, 0.0, 1.0);
+	vec4 linearColor = ((1- HPPercent) * redColor )+ (HPPercent * texColor);
+
+	FragColor = linearColor * FragColor;
+	//FragColor = texture(outTexture, texCoord) * FragColor;
 }

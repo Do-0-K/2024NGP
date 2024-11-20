@@ -49,7 +49,11 @@ private:
 
 	std::shared_ptr<SOCKET> m_pSock;	// 클라이언트 소켓
 
+
 	bool m_bShowMinimap = false;
 	glm::vec3 tempOppEYE{ 0.0, 0.0, 0.0 };
 	glm::vec2 tempOppAngle{ 0.0, 0.0 };
+
+	ShaderProgram* m_pShader;
+	int mLoc;
 };

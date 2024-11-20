@@ -33,3 +33,10 @@ float CharacterBase::getHP()
 {
 	return HP;
 }
+
+float CharacterBase::getNorHPPercent()
+{
+	if (HP < 0)
+		HP = 0;
+	return HP / MAXHP;
+}

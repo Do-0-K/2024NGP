@@ -1,6 +1,7 @@
 #include "Field.h"
 #include "Player.h"
 #include "NM_zombie.h"
+#include "ShaderProgram.h"
 
 #pragma pack(1)
 struct PlayerInfo {
@@ -25,7 +26,8 @@ Field::Field(CharacterBase* t_player, FieldMap* t_field, CameraObj* t_camera, Pr
 	item = new ItemBox(mTimer, mPlayer);
 
 	m_pOpposite = std::make_unique<NM_zombie>(100, 100, 100, 100, 100, 사람);
-
+	m_pShader = ShaderProgram::getShader();
+	mLoc = glGetUniformLocation(m_pShader->s_program, "HPPercent");
 }
 
 Field::~Field()
@@ -42,7 +44,10 @@ void Field::Update()
 	dynamic_cast<Player*>(mPlayer)->apply_item();
 	// 업데이트 헤더에서 애니메이션 적용하기
 	dynamic_cast<Player*>(mPlayer)->animation();
+	mCamera->setCameraEYE(dynamic_cast<Player*>(mPlayer)->getLoc());		// 카메라 업데이트 해주기
+	mCamera->setCameraAngle(dynamic_cast<Player*>(mPlayer)->getRot());
 	dynamic_cast<Player*>(mPlayer)->attack(enemy_list, mCamera);
+	mCamera->setCameraAngle(dynamic_cast<Player*>(mPlayer)->getRot());
 	// 여기서 서버에게 위치랑 필요한거 넘기기
 
 	/*
@@ -56,8 +61,6 @@ void Field::Update()
 		exit(1);
 	}
 	*/
-	mCamera->setCameraEYE(dynamic_cast<Player*>(mPlayer)->getLoc());		// 카메라 업데이트 해주기
-	mCamera->setCameraAngle(dynamic_cast<Player*>(mPlayer)->getRot());
 	// 총기 위치 변경
 	dynamic_cast<Player*>(mPlayer)->take_out_Wep();
 	dynamic_cast<Player*>(mPlayer)->getWeapon()->setLoc(dynamic_cast<Player*>(mPlayer)->getLoc());
@@ -162,10 +165,13 @@ void Field::togleMinimap()
 void Field::Render()
 {
 	ProcessInput();
-
 	glViewport(0, 0, 1280, 720);
 	m_pProj->setOrtho(false);
 	m_pProj->OutToShader();
+
+	//mCamera->setCameraEYE(dynamic_cast<Player*>(mPlayer)->getLoc());		// 카메라 업데이트 해주기
+	//mCamera->setCameraAngle(dynamic_cast<Player*>(mPlayer)->getRot());
+	//mUi->Update();
 
 	mCubemap->Render();
 	mField->Render();
@@ -180,6 +186,7 @@ void Field::Render()
 					first_zom = i;
 					update_first = true;
 				}
+				glUniform1f(mLoc, enemy_list[i]->getNorHPPercent());
 				enemy_list[i]->Render();
 				++alive;
 			}
@@ -187,6 +194,7 @@ void Field::Render()
 		else
 			break;
 	}
+	glUniform1f(mLoc, 1.0f);
 	m_pOpposite->Render();
 	item->Render();
 	mUi->Render();

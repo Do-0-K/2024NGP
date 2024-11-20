@@ -10,7 +10,6 @@ GLvoid drawScene(GLvoid);
 GLvoid Reshape(int w, int h);
 
 
-
 int width, height;			// 종횡 크기
 double frameTime;			// 출력 시간
 
@@ -29,7 +28,7 @@ void main(int argc, char** argv)
 	glutInitWindowPosition(100, 100);				// 윈도우의 위치 지정
 	glutInitWindowSize(width, height);					// 윈도우의 크기 지정
 	glutCreateWindow("Lone Mercenary");					// 윈도우 생성(윈도우 이름)
-	
+
 	//GLEW 초기화하기
 	glewExperimental = GL_TRUE;
 	if (glewInit() != GLEW_OK)						//glew 초기화
@@ -52,20 +51,20 @@ void main(int argc, char** argv)
 	glutReshapeFunc(Reshape);						// 다시 그리기 함수 지정
 	glutKeyboardFunc([](unsigned char key, int x, int y) {
 		mainApp->pKeyboard->Keyboard(key, x, y);
-	});						// 키 누를 때
+		});						// 키 누를 때
 	glutKeyboardUpFunc([](unsigned char key, int x, int y) {
 		mainApp->pKeyboard->KeyboardUp(key, x, y);
-	});					// 키 뗄때
+		});					// 키 뗄때
 
 	glutMotionFunc([](int x, int y) {
 		mainApp->pMouse->MotionPassive(x, y);
-	});
-	glutPassiveMotionFunc([](int x,int y) {			// motionPassive
+		});
+	glutPassiveMotionFunc([](int x, int y) {			// motionPassive
 		mainApp->pMouse->MotionPassive(x, y);
-	});
-	glutMouseFunc([](int button,int state,int x, int y) {
-		mainApp->pMouse->Mouse(button,state,x, y);
-	});
+		});
+	glutMouseFunc([](int button, int state, int x, int y) {
+		mainApp->pMouse->Mouse(button, state, x, y);
+		});
 	glutTimerFunc(frameTime, Timer, 0);
 	glutMainLoop();									// 이벤트 처리 시작
 }
@@ -77,6 +76,7 @@ GLvoid drawScene()									// 콜백 함수: 그리기 콜백 함수
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	mainApp->next_state();
+	mainApp->Update_MainApp();
 	if (not mainApp->Render())
 		return;
 
@@ -90,7 +90,7 @@ GLvoid Reshape(int w, int h)						// 콜백 함수: 다시 그리기 콜백 함수
 
 void Timer(int value)
 {
-	mainApp->Update_MainApp();
+	//mainApp->Update_MainApp();
 	glutPostRedisplay();
 	glutTimerFunc(frameTime, Timer, 0);
 }

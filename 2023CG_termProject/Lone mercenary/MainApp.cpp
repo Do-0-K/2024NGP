@@ -16,6 +16,7 @@ bool MainApp::Initialize()
 	// 기초 요소들 초기화
 	mSound = MySound::GetInstance();
 	mSound->play_mainbgm();
+	m_pShader = ShaderProgram::getShader();
 	Mesh::box_check = false;
 	camera = new CameraObj;
 	proj = new ProjObj;
@@ -25,7 +26,7 @@ bool MainApp::Initialize()
 	cubemap = new CubeMap;
 
 	current_scene = new Title(cubemap); // 메인 장면도 만들예정
-	
+
 	// 키보드 마우스 초기화
 	pKeyboard = new KeyboardFunc;
 	pKeyboard->setGame_stete(game_state);
@@ -216,6 +217,8 @@ bool MainApp::Update_MainApp()
 
 bool MainApp::Render()
 {
+	int loc = glGetUniformLocation(m_pShader->s_program, "HPPercent");
+	glUniform1f(loc, 1.0f);
 	current_scene->Render();
 	return true;
 }

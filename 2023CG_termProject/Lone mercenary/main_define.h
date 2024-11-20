@@ -15,6 +15,7 @@
 #include "NM_zombie.h"
 #include "GameTimer.h"
 #include "ItemBox.h"
+#include "ShaderProgram.h"
 
 // ¿Â∏ÈµÈ
 #include "Scene.h"

@@ -18,13 +18,14 @@ class KeyboardFunc;
 class MouseFunc;
 class EnemyBase;
 class Scene;
+class ShaderProgram;
 
 class MainApp {
 public:
 	// 미완성, 수정 예정
 	~MainApp();
 
-	bool Initialize();				
+	bool Initialize();
 	bool Update_MainApp();
 	void DestroyMainApp();
 
@@ -63,4 +64,5 @@ private:
 
 	// 아이템 선택 신에 들어갈 요소
 
+	ShaderProgram* m_pShader;
 };
