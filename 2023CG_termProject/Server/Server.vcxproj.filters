@@ -13,12 +13,66 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="소스 파일\mesh">
+      <UniqueIdentifier>{c3ac0344-3a8b-46e4-ba71-f21d094d8ffa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Player,Item,Enemy">
+      <UniqueIdentifier>{f71c44f4-b738-45ca-8f6b-bedb18a98bb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Player,Item,Enemy\Enemy">
+      <UniqueIdentifier>{bc5b01f1-ccf4-4eb6-b163-61e0d9cbe4d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Player,Item,Enemy\Enemy\Normal_zombie">
+      <UniqueIdentifier>{37c30ed4-976d-4c74-bc4c-a3bf917ea034}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Player,Item,Enemy\itembox">
+      <UniqueIdentifier>{5fdfec22-5d46-4f9f-a0d1-61d5601d8b9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Player,Item,Enemy\Player">
+      <UniqueIdentifier>{b73ca062-63f2-4b2d-ab60-33c6b70221fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\field">
+      <UniqueIdentifier>{88256232-b19e-47da-a15d-2f7ab89bc9df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Weapon">
+      <UniqueIdentifier>{9fe74223-c62e-4f00-8a0c-553d5b0bf915}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
+    <ClInclude Include="TCPServer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="TCPServer.h">
+    <ClInclude Include="Mesh.h">
+      <Filter>소스 파일\mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="NM_zombie.h">
+      <Filter>소스 파일\Player,Item,Enemy\Enemy\Normal_zombie</Filter>
+    </ClInclude>
+    <ClInclude Include="NMMesh.h">
+      <Filter>소스 파일\Player,Item,Enemy\Enemy\Normal_zombie</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemBox.h">
+      <Filter>소스 파일\Player,Item,Enemy\itembox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lone mercenary\CharacterBase.h">
+      <Filter>소스 파일\Player,Item,Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy.h">
+      <Filter>소스 파일\Player,Item,Enemy\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>소스 파일\Player,Item,Enemy\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Field.h">
+      <Filter>소스 파일\field</Filter>
+    </ClInclude>
+    <ClInclude Include="Weapon.h">
+      <Filter>소스 파일\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="GameTimer.h">
+      <Filter>소스 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -27,6 +81,33 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="TCPServer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>소스 파일\mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="NM_zombie.cpp">
+      <Filter>소스 파일\Player,Item,Enemy\Enemy\Normal_zombie</Filter>
+    </ClCompile>
+    <ClCompile Include="ItemBox.cpp">
+      <Filter>소스 파일\Player,Item,Enemy\itembox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lone mercenary\CharacterBase.cpp">
+      <Filter>소스 파일\Player,Item,Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Enemy.cpp">
+      <Filter>소스 파일\Player,Item,Enemy\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>소스 파일\Player,Item,Enemy\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Field.cpp">
+      <Filter>소스 파일\field</Filter>
+    </ClCompile>
+    <ClCompile Include="Weapon.cpp">
+      <Filter>소스 파일\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="GameTimer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

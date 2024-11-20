@@ -378,7 +378,7 @@ glm::mat4 Mesh::getModelTrans()
 	return modelTrans;
 }
 
-bool Mesh::collision_check(const Mesh& other)
+bool Mesh::collision_check(const Mesh& other) 
 {
 	glm::vec3 w_center = glm::vec3(modelTrans * glm::vec4(OBB_center, 1.0f));
 	glm::vec3 a_axis[3];

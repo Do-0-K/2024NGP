@@ -1,30 +1,6 @@
 #include "TCPServer.h"
 
-#pragma pack(1)
-struct PlayerInfo {
-    glm::vec3 cameraEYE;
-    glm::vec2 Angle;
-};
-#pragma pack()
-struct ObjectInfo
-{
-    int HP;
-    glm::vec3 Pos;
-    glm::vec2 Rot;
 
-};
-
-struct RenderInfo
-{
-    int HP;
-    int ammo;
-    PlayerInfo opposite;
-    ObjectInfo alive_enemy[14];
-    int alive_num;
-    ObjectInfo box;
-    int remainTime;
-
-};
 
 
 TCPServer::TCPServer()
@@ -83,7 +59,11 @@ void TCPServer::Execute() {
     std::cout << "Waiting for clients to connect..." << std::endl;
     AcceptClients();
     // 이 함수 두명 받으면 끝인데 서버 유지 되나요?
-    while (1);
+    while (1) {
+        //인게임 루프 단계
+       // Wait
+            //업데이트 할 때 플레이어 체력,남은 시간, 좀비들 움직임
+    };
 }
 
 // 이렇게 하면 소켓 살아있나요?
@@ -103,6 +83,7 @@ void TCPServer::AcceptClients() {
             << ", Port: " << ntohs(clientaddr.sin_port) << std::endl;
 
         client_sockets.push_back(clientSocket);
+    
 
         // Prepare ThreadArg
         ThreadArg* data = new ThreadArg{ clientSocket, clientCount };
@@ -125,25 +106,25 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
     int clientIndex = data->clientIndex;
     delete data; // Free the dynamically allocated ThreadArg
 
-    PlayerInfo playerinfo;
+    UpdateInfo updateInfo;
+    RenderInfo rederinfo;
     int recvSize;
 
     while (true) {
         // Receive PlayerInfo structure from client
-        recvSize = recv(clientSocket, (char*)&playerinfo, sizeof(playerinfo), MSG_WAITALL);
+        recvSize = recv(clientSocket, (char*)&updateInfo, sizeof(updateInfo), MSG_WAITALL);
         if (recvSize <= 0) {
             std::cout << "Client " << clientIndex << " disconnected or error occurred. Closing connection." << std::endl;
             break;
         }
 
+        //공격 부분은 여기서 관리 공격 여부 판단해서 좀비리스트들 중에서 누가 맞았는지 판별하고 체력 업데이트 시키고 그 정보?를 다시 send()한다
         // Print received PlayerInfo
-        std::cout << "Received PlayerInfo from client " << clientIndex << ": " << std::endl;
-        std::cout << "  cameraEYE: (" << playerinfo.cameraEYE.x << ", "
-            << playerinfo.cameraEYE.y << ", " << playerinfo.cameraEYE.z << ")" << std::endl;
-        std::cout << "  Angle: (" << playerinfo.Angle.x << ", " << playerinfo.Angle.y << ")" << std::endl;
+       
+        std::cout << "  HP: (" << updateInfo.flag << std::endl;
 
         // Echo back to the same client for testing
-        send(clientSocket, (char*)&playerinfo, sizeof(playerinfo), 0);
+        send(clientSocket, (char*)&rederinfo, sizeof(rederinfo), 0);
     }
 
     closesocket(clientSocket);
