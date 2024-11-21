@@ -16,6 +16,7 @@ bool MainApp::Initialize()
 	// 기초 요소들 초기화
 	mSound = MySound::GetInstance();
 	mSound->play_mainbgm();
+	m_pShader = ShaderProgram::getShader();
 	Mesh::box_check = false;
 	camera = new CameraObj;
 	proj = new ProjObj;
@@ -25,7 +26,7 @@ bool MainApp::Initialize()
 	cubemap = new CubeMap;
 
 	current_scene = new Title(cubemap); // 메인 장면도 만들예정
-	
+
 	// 키보드 마우스 초기화
 	pKeyboard = new KeyboardFunc;
 	pKeyboard->setGame_stete(game_state);
@@ -36,7 +37,7 @@ bool MainApp::Initialize()
 	pKeyboard->setScene(current_scene);
 
 	// 게임 요소 초기화
-	MainAppConnect();
+	//MainAppConnect();
 
 	return true;
 }
@@ -87,7 +88,7 @@ void MainApp::next_state()
 		if (pMouse->next_state()) {
 			game_state = 아이템선택;
 			delete current_scene;
-			mPlayer = new Player(100, 200, 40, 20, 0);
+			mPlayer = new Player(100, 200, 40, 20, 0,m_pSock); //when make player, also make player's socket
 			current_scene = new Select_Item(mPlayer, cubemap);
 			pKeyboard->setGame_stete(game_state);
 			pKeyboard->setScene(current_scene);
@@ -104,7 +105,7 @@ void MainApp::next_state()
 			delete current_scene;
 			e_arrayReady();
 			game_timer = new GameTimer(mPlayer);
-			current_scene = new Field(mPlayer, field, camera, enemy_array, game_timer, cubemap, m_pSock);
+			current_scene = new Field(mPlayer, field, camera, proj, enemy_array, game_timer, cubemap, m_pSock);
 			score_scene = new ScoreBoard(cubemap, enemy_array, game_timer, camera);
 			pKeyboard->setGame_stete(game_state);
 			pKeyboard->setScene(current_scene);
@@ -114,22 +115,16 @@ void MainApp::next_state()
 			mSound->play_fieldbgm();
 			MouseFunc::s_x = -1;
 			MouseFunc::s_y = -1;
-
-			//ready_state = 1; //완료 변수
-			//// 여기서 한번 서버한테 완료 메시지 보내기
-			//retval = send(*m_pSock, (char*)&ready_state, sizeof(int), 0);
-			// 우리 완료 메시지 안쓰기로 했잖니 도영아
 		}
 		break;
 	case 필드:
-		// 여기 if문은 바뀐게 없네
-		if (mPlayer->Death_check() || Allkill_check() || game_timer->getremaining() == 0) {
+		if (game_timer->getremaining() == 0) { //time over = game over
 			glutSetCursor(GLUT_CURSOR_RIGHT_ARROW);
 			game_state = 결과창;
 			// 결과창 내보내기 전에 서버에게 개별 점수 받기
-			retval = recv(*m_pSock, (char*)score, sizeof(int), 0); //최종 점수를 가져온다
-			dynamic_cast<ScoreBoard*>(score_scene)->SetTotalscore(score); //최종 점수 설정
-			dynamic_cast<ScoreBoard*>(score_scene)->Update_1(); //최종 점수대로 메쉬 지정
+			retval = recv(*m_pSock, (char*)score, sizeof(int), 0); //take total score from server
+			dynamic_cast<ScoreBoard*>(score_scene)->SetTotalscore(score); //total score set
+			dynamic_cast<ScoreBoard*>(score_scene)->Update_1(); //finally set mesh
 			delete current_scene;
 			current_scene = score_scene;
 
@@ -186,10 +181,7 @@ void MainApp::MainAppConnect()
 		std::cout << "can't find Hostname" << std::endl;
 		exit(1);
 	}
-	//const char* cc = "25.30.142.137";
 
-	// 알아낸 IP를 set해주기
-	//inet_pton(AF_INET, cc, &serveraddr.sin_addr);
 	memcpy(&serveraddr.sin_addr, ptr->h_addr_list[0], ptr->h_length);
 
 	char test[22];
@@ -216,6 +208,8 @@ bool MainApp::Update_MainApp()
 
 bool MainApp::Render()
 {
+	int loc = glGetUniformLocation(m_pShader->s_program, "HPPercent");
+	glUniform1f(loc, 1.0f);
 	current_scene->Render();
 	return true;
 }

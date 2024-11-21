@@ -32,10 +32,10 @@ void MouseFunc::Mouse(int button, int state, int x, int y)
 		}
 	}
 	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
-		if(필드 == game_state)
+		if (필드 == game_state)
 			dynamic_cast<Player*>(dynamic_cast<Field*>(mScene)->getPlayer())->conti_attack(false);
 	}
-	glutPostRedisplay();		// ???
+	//glutPostRedisplay();		// ???
 }
 
 void MouseFunc::MotionPassive(int x, int y)
@@ -46,7 +46,7 @@ void MouseFunc::MotionPassive(int x, int y)
 		dynamic_cast<Player*>(dynamic_cast<Field*>(mScene)->getPlayer())->animi_rot(pos.x - 640, pos.y - 360);
 		glutWarpPointer(1280 / 2, 720 / 2);
 	}
-	glutPostRedisplay();		// ???
+	//glutPostRedisplay();		// ???
 }
 
 void MouseFunc::setGame_stete(int n)

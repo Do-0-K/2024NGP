@@ -18,11 +18,19 @@ void ProjObj::Initialize()
 	OutToShader();
 }
 
+void ProjObj::setOrtho(bool bOrtho)
+{
+	m_bOrtho = bOrtho;
+}
+
 // 셰이더로 보내주는 함수, 마찬가지로 요소가 바뀌면 불러주자
 void ProjObj::OutToShader()
 {
 	ProjMatrix = glm::mat4(1.0f);
-	ProjMatrix = glm::perspective(glm::radians(fovy), aspect, n, f);
+	if (m_bOrtho)
+		ProjMatrix = glm::ortho(-150.0, 150.0, -150.0, 150.0, 0.0, 512.0);
+	else
+		ProjMatrix = glm::perspective(glm::radians(fovy), aspect, n, f);
 	int uni = glGetUniformLocation(shader->s_program, "proj");
 	if (uni < 0)
 		std::cout << "proj를 찾을 수 없습니다" << std::endl;

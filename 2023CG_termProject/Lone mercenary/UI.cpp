@@ -98,7 +98,7 @@ UI::~UI()
 	delete crossline;
 }
 
-void UI::Update()
+void UI::Update(int nRemainTime)
 {
 	//============================================================
 	hp_back->setLoc(dynamic_cast<Player*>(mPlayer)->getLoc());
@@ -111,7 +111,7 @@ void UI::Update()
 	hp_1->setLoc(dynamic_cast<Player*>(mPlayer)->getLoc());
 	hp_1->setRot(dynamic_cast<Player*>(mPlayer)->getRot());
 
-	int php =mPlayer->getHP();
+	int php = mPlayer->getHP();
 	if (php / 100 != h100) {
 		switch (php / 100) {
 		case 0:
@@ -425,7 +425,7 @@ void UI::Update()
 	crossline->setLoc(dynamic_cast<Player*>(mPlayer)->getLoc());
 	crossline->setRot(dynamic_cast<Player*>(mPlayer)->getRot());
 
-	timer->Update();
+	timer->Update(nRemainTime);
 }
 
 void UI::Render()
@@ -434,19 +434,19 @@ void UI::Render()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	hp_back->Render();
 	bullet_back->Render();
-	if(h100 != 0)
+	if (h100 != 0)
 		hp_100->Render();
-	if(h100 != 0 || h10 != 0)
+	if (h100 != 0 || h10 != 0)
 		hp_10->Render();
 	hp_1->Render();
 
-	if(c10 != 0)
+	if (c10 != 0)
 		cur_b_10->Render();
 	cur_b_1->Render();
 	cur_b_sl->Render();
-	if(r100 !=0)
+	if (r100 != 0)
 		r_b_100->Render();
-	if(r100!= 0 ||r10 !=0)
+	if (r100 != 0 || r10 != 0)
 		r_b_10->Render();
 	r_b_1->Render();
 

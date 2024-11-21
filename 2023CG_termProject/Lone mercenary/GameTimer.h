@@ -18,7 +18,7 @@ public:
 	void plus_time(int);
 	bool check_end();
 
-	void Update();
+	void Update(int nTime);
 	void Render();
 
 	int getremaining();
