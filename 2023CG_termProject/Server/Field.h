@@ -10,7 +10,7 @@ class Field : public Scene {
 public:
 	Field(CharacterBase*, std::vector<EnemyBase*>&,std::shared_ptr<SOCKET>& pSock);
 	~Field();
-
+	void Update();
 	CharacterBase* getPlayer();
 	
 	std::vector<EnemyBase*>& getList();

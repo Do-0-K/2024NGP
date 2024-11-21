@@ -29,14 +29,7 @@ FieldMap::~FieldMap()
 	delete house_4;
 }
 
-void FieldMap::Render() const
-{
-	bottom->Render();
-	house_1->Render();
-	house_2->Render();
-	house_3->Render();
-	house_4->Render();
-}
+
 
 Mesh* FieldMap::gethouse_1()
 {

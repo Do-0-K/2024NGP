@@ -37,6 +37,9 @@
     <Filter Include="소스 파일\Weapon">
       <UniqueIdentifier>{9fe74223-c62e-4f00-8a0c-553d5b0bf915}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\fieldmap">
+      <UniqueIdentifier>{8fb3d5a9-0a2a-464d-93f0-ece870f41efb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TCPServer.h">
@@ -75,6 +78,12 @@
     <ClInclude Include="stdafx.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>소스 파일\field</Filter>
+    </ClInclude>
+    <ClInclude Include="FieldMap.h">
+      <Filter>소스 파일\fieldmap</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -109,6 +118,9 @@
     </ClCompile>
     <ClCompile Include="GameTimer.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="FieldMap.cpp">
+      <Filter>소스 파일\fieldmap</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

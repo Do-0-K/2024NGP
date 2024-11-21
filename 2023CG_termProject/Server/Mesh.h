@@ -11,12 +11,12 @@ class Mesh {
 public:
 	Mesh(std::string, std::string, int, int);
 	virtual ~Mesh();
-
+	
 	void init_scale(float);							// 초기 스케일 조정
 	void init_position(float, float, float);		// 초기 위치 설정
 	void init_rotate(float, float, float, float);	// 초기 회전 설정
 
-
+	
 	void setLoc(glm::vec3);							// 위치 바꿔주기
 	void setRot(glm::vec2);							// 회전율 바꿔주기
 	void setAmb(float);

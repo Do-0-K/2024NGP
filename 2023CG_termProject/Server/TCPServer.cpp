@@ -115,13 +115,17 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
         recvSize = recv(clientSocket, (char*)&updateInfo, sizeof(updateInfo), MSG_WAITALL);
         if (recvSize <= 0) {
             std::cout << "Client " << clientIndex << " disconnected or error occurred. Closing connection." << std::endl;
+
             break;
         }
-
+        std::vector <EnemyBase*> enemylist;
+        enemylist.reserve(14);
+        
+        
         //공격 부분은 여기서 관리 공격 여부 판단해서 좀비리스트들 중에서 누가 맞았는지 판별하고 체력 업데이트 시키고 그 정보?를 다시 send()한다
         // Print received PlayerInfo
        
-        std::cout << "  HP: (" << updateInfo.flag << std::endl;
+        std::cout << " HP: (" << updateInfo.flag << std::endl;
 
         // Echo back to the same client for testing
         send(clientSocket, (char*)&rederinfo, sizeof(rederinfo), 0);

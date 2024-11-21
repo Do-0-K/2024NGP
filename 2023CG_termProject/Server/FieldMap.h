@@ -18,7 +18,7 @@ public:
 	Mesh* gethouse_3();
 	Mesh* gethouse_4();
 
-	void Render() const;
+
 protected:
 private:
 	Mesh* bottom{ nullptr };

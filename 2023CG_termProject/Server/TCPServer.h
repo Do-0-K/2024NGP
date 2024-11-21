@@ -5,7 +5,7 @@
 #pragma once
 #include "stdafx.h"
 #include "NM_zombie.h"
-
+#include "Player.h"
 
 
 #define Portnum 25715
@@ -42,7 +42,7 @@ struct UpdateInfo           ////The packet which client send to client
     int flag;
     bool useItem[4];
     glm::vec3 cameraEYE;
-    glm::vec3 cameraAT;
+    glm::vec2 cameraangle;
     int ammo;
 
 };

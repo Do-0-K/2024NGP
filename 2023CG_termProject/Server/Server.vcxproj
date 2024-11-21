@@ -136,12 +136,14 @@
     <ClInclude Include="..\Lone mercenary\CharacterBase.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Field.h" />
+    <ClInclude Include="FieldMap.h" />
     <ClInclude Include="GameTimer.h" />
     <ClInclude Include="ItemBox.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="NMMesh.h" />
     <ClInclude Include="NM_zombie.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Scene.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TCPServer.h" />
     <ClInclude Include="Weapon.h" />
@@ -150,6 +152,7 @@
     <ClCompile Include="..\Lone mercenary\CharacterBase.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Field.cpp" />
+    <ClCompile Include="FieldMap.cpp" />
     <ClCompile Include="GameTimer.cpp" />
     <ClCompile Include="ItemBox.cpp" />
     <ClCompile Include="main.cpp" />
