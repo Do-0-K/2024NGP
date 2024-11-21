@@ -44,7 +44,6 @@ public:
 protected:
 private:
 	int game_state;
-	int ready_state;
 	CameraObj* camera;
 	ProjObj* proj;
 	CharacterBase* mPlayer;
