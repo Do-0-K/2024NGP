@@ -23,7 +23,7 @@ Field::Field(CharacterBase* t_player, FieldMap* t_field, CameraObj* t_camera, Pr
 	first_zom = 0;
 	mUi = new UI(mPlayer, mTimer);
 	max_alive = 14;
-	item = new ItemBox(mTimer, mPlayer);
+	item = new ItemBox(mPlayer);
 
 	m_pOpposite = std::make_unique<NM_zombie>(100, 100, 100, 100, 100, 사람);
 	m_pShader = ShaderProgram::getShader();
@@ -137,7 +137,7 @@ void Field::Update()
 	// 서버가 아이템 박스 관리
 	//===================================================
 	item->check_collision();
-	item->check_time();
+	//item->check_time();
 	item->rot_ani();
 	//====================================================
 	mUi->Update(m_nTime);
