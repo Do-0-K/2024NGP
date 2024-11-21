@@ -92,7 +92,7 @@ void Field::Update()
 	m_pOpposite->UpdateMatrix();
 	// 서버에서 받을 예정, 준비 되면 삭제
 	//===========================================================
-	int alive{};
+	/*int alive{};
 	EnemyBase* aliveEnemy[MAX_ALIVE];
 	bool update_first = false;
 	for (int i = first_zom; i < enemy_list.size(); ++i) {
@@ -105,6 +105,15 @@ void Field::Update()
 			if (MAX_ALIVE == alive)
 				break;
 		}
+	}*/
+	float y{};
+	static float rot{};
+	for (EnemyBase*& enemy : enemy_list) {
+		enemy->setLoc(glm::vec3(0.0, y, 0.0));
+		enemy->setRot(glm::vec2(rot, 0.0));
+		dynamic_cast<NM_zombie*>(enemy)->UpdateMatrix();
+		y += 10.0;
+		rot += 2.0f;
 	}
 
 
@@ -131,7 +140,7 @@ void Field::Update()
 	item->check_time();
 	item->rot_ani();
 	//====================================================
-	mUi->Update();
+	mUi->Update(m_nTime);
 }
 
 // 상대 위치 테스트용 키 입력 함수
@@ -152,6 +161,9 @@ void Field::ProcessInput()
 	if (keyBuffer[VK_RIGHT] & 0x80) {
 		tempOppAngle.x += 3.0f;
 	}
+	if (keyBuffer['B'] & 0x80) {
+		m_nTime -= 1;
+	}
 }
 
 void Field::togleMinimap()
@@ -166,8 +178,8 @@ void Field::Render()
 {
 	ProcessInput();
 	glViewport(0, 0, 1280, 720);
-	m_pProj->setOrtho(false);
-	m_pProj->OutToShader();
+	//m_pProj->setOrtho(false);
+	//m_pProj->OutToShader();
 
 	//mCamera->setCameraEYE(dynamic_cast<Player*>(mPlayer)->getLoc());		// 카메라 업데이트 해주기
 	//mCamera->setCameraAngle(dynamic_cast<Player*>(mPlayer)->getRot());
@@ -177,7 +189,7 @@ void Field::Render()
 	mField->Render();
 	dynamic_cast<Player*>(mPlayer)->getWeapon()->Render();
 
-	int alive{};
+	/*int alive{};
 	bool update_first = false;
 	for (int i = first_zom; i < enemy_list.size(); ++i) {
 		if (alive < MAX_ALIVE) {
@@ -193,7 +205,14 @@ void Field::Render()
 		}
 		else
 			break;
+	}*/
+	for (EnemyBase*& enemy : enemy_list) {
+		if (not enemy->Death_check()) {
+			glUniform1f(mLoc, enemy->getNorHPPercent());
+			enemy->Render();
+		}
 	}
+
 	glUniform1f(mLoc, 1.0f);
 	m_pOpposite->Render();
 	item->Render();
@@ -213,6 +232,7 @@ void Field::Render()
 		m_pProj->OutToShader();
 
 		mField->Render();
+		item->Render();
 
 		m_pOpposite->Render();
 		m_pOpposite->setLoc(oppEYE);
@@ -220,6 +240,9 @@ void Field::Render()
 		m_pOpposite->UpdateMatrix();
 
 		m_pOpposite->Render();
+
+		m_pProj->setOrtho(false);
+		m_pProj->OutToShader();
 	}
 }
 

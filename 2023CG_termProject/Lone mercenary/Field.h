@@ -56,4 +56,6 @@ private:
 
 	ShaderProgram* m_pShader;
 	int mLoc;
+
+	int m_nTime = 180;
 };
