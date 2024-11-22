@@ -1,14 +1,37 @@
 #include "TCPServer.h"
+//#include "Player.h"
 
 
+// Define static member variables
+
+//std::vector<EnemyBase*> TCPServer::enemyList;  // 적 리스트 정의
+//Player* TCPServer::player = nullptr;          // 플레이어 정의 및 초기화
+UpdateInfo TCPServer::updateInfo[2];          // 클라이언트 업데이트 정보 정의
+RenderInfo TCPServer::renderInfo[2];          // 클라이언트 렌더링 정보 정의
 
 
-TCPServer::TCPServer()
-{
+TCPServer::TCPServer() {
+	// Create player
+	player = new Player(100, 200, 40, 20, 0);
 
+	// Create and initialize enemies
+	for (int i = 0; i < 14; ++i) {
+		enemyList.push_back(new NM_zombie(1200, 1350, 20, 30, 27, 일반));
+	}
 }
-TCPServer::~TCPServer()
-{
+TCPServer::~TCPServer() {
+	// Delete player
+	delete player;
+
+
+	// Close all sockets and threads
+	for (SOCKET& client : client_sockets) {
+		closesocket(client);
+	}
+	for (HANDLE& thread : client_threads) {
+		CloseHandle(thread);
+	}
+	WSACleanup();
 }
 void TCPServer::BindAndListen() {
 	WSADATA wsaData;
@@ -91,7 +114,7 @@ void TCPServer::AcceptClients() {
 
 
 		// Prepare ThreadArg
-		ThreadArg* data = new ThreadArg{ clientSocket, clientCount };
+		ThreadArg* data = new ThreadArg{ client_sockets[clientCount], clientCount, this};
 
 		// Pass the ThreadArg to the thread
 		HANDLE clientThread = CreateThread(NULL, 0, ClientThread, data, 0, NULL);
@@ -112,13 +135,7 @@ void TCPServer::AcceptClients() {
 void TCPServer::Update()
 {
 
-	for (SOCKET& client : client_sockets) {
-		closesocket(client);
-	}
-	for (HANDLE& thread : client_threads) {
-		CloseHandle(thread);
-	}
-	WSACleanup();
+	
 
 }
 void FillRenderInfo(RenderInfo& renderInfo, const std::vector<EnemyBase*>& enemyList, Player* player) {
@@ -132,7 +149,7 @@ void FillRenderInfo(RenderInfo& renderInfo, const std::vector<EnemyBase*>& enemy
 	}
 
 	renderInfo.alive_num = enemyList.size(); // Total number of enemies
-	// renderInfo.remainTime = player->getRemainingTime();
+	//renderInfo.remainTime = player->getRemainingTime();
 }
 
 
@@ -142,45 +159,42 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
 	ThreadArg* data = static_cast<ThreadArg*>(arg);
 	SOCKET clientSocket = data->clientSocket;
 	int clientIndex = data->clientIndex;
+	TCPServer* server = data->serverInstance; // Access the TCPServer instance
 	delete data; // Free the dynamically allocated ThreadArg
 
-	UpdateInfo updateInfo;
-	RenderInfo renderInfo;
+	/*UpdateInfo updateInfo;
+	RenderInfo renderInfo;*/
 	int recvSize;
 
 	// Initialize Player and Enemy List
 	
-	Player* player  = new Player(100, 200, 40, 20, 0);
-	std::vector<EnemyBase*> enemyList;
-	enemyList.reserve(14); // Reserve space for 14 zombies
+	//Player* player  = new Player(100, 200, 40, 20, 0);
+	
+	
 
 	// Create and initialize zombies
-	for (int i = 0; i < 14; ++i) {
-		EnemyBase* zombie = new NM_zombie(); // Assuming NM_zombie inherits EnemyBase
-		zombie->setLoc(glm::vec3(i * 2.0f, 0.0f, 0.0f)); // Example: spread zombies across the field
-		enemyList.push_back(zombie);
-	}
+	
 
 	// Main thread loop
 	while (true) {
 		// Receive PlayerInfo structure from client
-		recvSize = recv(clientSocket, (char*)&updateInfo, sizeof(updateInfo), MSG_WAITALL);
+		recvSize = recv(clientSocket, (char*)&server->updateInfo[clientIndex], sizeof(server->updateInfo[clientIndex]), MSG_WAITALL);
 		if (recvSize <= 0) {
 			std::cout << "Client " << clientIndex << " disconnected or error occurred. Closing connection." << std::endl;
 			break;
 		}
 
 		// Check if player is attacking (flag == 1)
-		if (updateInfo.flag == 1)
+		if (server->updateInfo[clientIndex].flag == 1)
 		{
 			std::cout << "Player " << clientIndex << " is attacking!" << std::endl;
 
 			// Check collisions between player's attack and zombies
-			for (auto& zombie : enemyList) {
+			for (auto& zombie : server->enemyList) {
 				PlayerInfo temp;
-				temp.cameraEYE = updateInfo.cameraEYE;
-				temp.Angle = updateInfo.cameraangle;
-				if (!zombie->Death_check() && player->attack_check(enemyList, &temp)) {
+				temp.cameraEYE = server->updateInfo[clientIndex].cameraEYE;
+				temp.Angle = server->updateInfo[clientIndex].cameraangle;
+				if (!zombie->Death_check() && server->player->attack_check(server->enemyList, &temp)) {
 					std::cout << "Zombie hit! Remaining HP: " << zombie->getHP() << std::endl;		//이 부분에서 맞은 좀비 체력 깎기
 
 					// If zombie dies, mark it
@@ -194,6 +208,7 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
 		}
 		else
 		{
+
 			//플레이어가 움직일 때 
 		}
 	
@@ -216,14 +231,14 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
 	//}
 
 	//// Prepare renderInfo to send back to the client
-	//FillRenderInfo(renderInfo, enemyList, player);
+	FillRenderInfo(server->renderInfo[clientIndex], server->enemyList, server->player);
 
 	// Send renderInfo back to the client
 		send(clientSocket, (char*)&renderInfo, sizeof(renderInfo), 0);
 	}
 
 	// Cleanup
-	for (auto& zombie : enemyList) {
+	for (auto& zombie : server->enemyList) {
 		delete zombie;
 	}
 	/* delete player;*/

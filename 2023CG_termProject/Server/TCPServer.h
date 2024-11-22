@@ -10,23 +10,21 @@
 
 #define Portnum 25715
 
-
+class TCPServer;
+class Player;
 #pragma pack(1)
-struct PlayerInfo {         //store player infomation
+struct PlayerInfo {         // Store player information
     glm::vec3 cameraEYE;
     glm::vec2 Angle;
 };
-#pragma pack()
-struct ObjectInfo       // store object(enemy,box etc..) information
-{
+
+struct ObjectInfo {         // Store object(enemy, box, etc.) information
     int HP;
     glm::vec3 Pos;
     glm::vec2 Rot;
-
 };
 
-struct RenderInfo           //The packet which server send to client
-{
+struct RenderInfo {         // The packet which server sends to client
     int HP;
     int ammo;
     PlayerInfo opposite;
@@ -34,41 +32,41 @@ struct RenderInfo           //The packet which server send to client
     int alive_num;
     ObjectInfo box;
     int remainTime;
-
 };
 
-struct UpdateInfo           ////The packet which client send to client
-{
+struct UpdateInfo {         // The packet which client sends to server
     int flag;
     bool useItem[4];
     glm::vec3 cameraEYE;
     glm::vec2 cameraangle;
     int ammo;
-
 };
 
 struct ThreadArg {
     SOCKET clientSocket;
-    int clientIndex; // To track the client's index in client_sockets
+    int clientIndex;
+    TCPServer* serverInstance;  // Reference to TCPServer instance
 };
 
-class TCPServer
-{
+class TCPServer {
+#pragma pack()
 public:
     TCPServer();
     ~TCPServer();
     void BindAndListen();
     void Execute();
     void Update();
+    void AcceptClients();
+    static DWORD WINAPI ClientThread(LPVOID arg);
 
 private:
     SOCKET listen_sock = NULL;
     std::vector<SOCKET> client_sockets;
     std::vector<HANDLE> client_threads;
     int clientCount = 0;
-    struct sockaddr_in serveraddr;
-    int addrlen;
 
-    void AcceptClients();
-    static DWORD WINAPI ClientThread(LPVOID arg);
+    std::vector<EnemyBase*> enemyList;  // Enemy list
+    Player* player;                     // Player instance
+    static UpdateInfo updateInfo[2];           // Update information for 2 clients
+    static RenderInfo renderInfo[2];           // Render information for 2 clients
 };
