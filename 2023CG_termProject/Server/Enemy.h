@@ -29,6 +29,7 @@ public:
 
 	void setPlayerLoc(CharacterBase*);
 	glm::vec3 getLoc();
+	glm::vec2 getRot();
 	
 protected:
 	glm::vec3 cur_loc{0.0f};

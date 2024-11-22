@@ -39,14 +39,9 @@ Player::Player(float hp, float max, float spd, float def, float atk)
 	cur_loc = glm::vec3(0, 10, 0);				// 초기 위치 지정, 이거 바꿔주면 자연스래 카메라도 위치 바뀜
 	cur_rot = glm::vec2(0.0f, 0.0f);
 	init_Weapon_rot = glm::vec2(cur_rot.x, cur_rot.y + 90.0f);
-	move[0] = move[1] = move[2] = move[3] = false;
-	item[0] = item[1] = item[2] = item[3] = false;
-	atck = false;
-	changing = true;
-	reloading = false;
-	knife_at = false;
+	
+	
 	cnt = 0;
-	mousesense = 0.02f;
 	angle = 0.0f;
 	type = 0;
 	bonus_atack = 0;
@@ -68,6 +63,11 @@ glm::vec2 Player::getRot()
 glm::vec2 Player::getWepRot()
 {
 	return init_Weapon_rot;
+}
+
+float Player::getammo()
+{
+	return DEF;
 }
 
 
@@ -95,7 +95,7 @@ glm::vec3 CalculateAt(const glm::vec3& eye, const glm::vec2& angle) {
 	return atPoint;
 }
 
-void Player::attack_check(std::vector<EnemyBase*>& temp_list, PlayerInfo* playerinfo)
+bool Player::attack_check(std::vector<EnemyBase*>& temp_list, PlayerInfo* playerinfo)
 {	// 인자 설명 1. 좀비 리스트   2. 카메라(위치랑 바라보는 곳 받아서 광선 구하고
 	int aliving = 0;		// 살아있는 좀비 수
 	glm::vec3 contact = glm::vec3(1.0f);
@@ -108,6 +108,7 @@ void Player::attack_check(std::vector<EnemyBase*>& temp_list, PlayerInfo* player
 	float mindist = 0.0f;
 	bool is_contact = false;
 	int bonus_damage = 0;
+	bool hit_detected = false; // To track if a zombie was hit
 	switch (weapon) { //내 사거리 조절
 	case 나이프:
 		mindist = 200.0f;
@@ -122,11 +123,12 @@ void Player::attack_check(std::vector<EnemyBase*>& temp_list, PlayerInfo* player
 	glm::vec3 ray_first = glm::vec3(playerinfo->cameraEYE);
 	glm::vec3 ray_last = glm::vec3(CalculateAt(playerinfo->cameraEYE, playerinfo->Angle));
 	glm::vec3 ray = ray_last - ray_first;
-	//std::cout << ray_first.x << "\t" << ray_first.y << "\t" << ray_first.z << std::endl;
-	//std::cout << ray.x << "\t" << ray.y << "\t" << ray.z << std::endl;
+
+
 	int alive{};
 	EnemyBase* aliveEnemy[MAX_ALIVE];
 	bool update_first = false;
+
 	for (int i = Field::first_zom; i < temp_list.size(); ++i) {
 		if (not temp_list[i]->Death_check()) {
 			if (not update_first) {
@@ -138,6 +140,8 @@ void Player::attack_check(std::vector<EnemyBase*>& temp_list, PlayerInfo* player
 				break;
 		}
 	}
+
+
 	for (int i = 0; i < alive; ++i) {
 		float xz_dist = 0.0f;
 		float yz_dist = 0.0f;
@@ -155,78 +159,38 @@ void Player::attack_check(std::vector<EnemyBase*>& temp_list, PlayerInfo* player
 			FinalMinVec = glm::vec3(toWorld * glm::vec4(MinVec, 1.0f)); //변환된 최종 바운더리 박스 왼쪽 아래 점
 			FinalMaxVec = glm::vec3(toWorld * glm::vec4(MaxVec, 1.0f)); //변환된 최종 바운더리 박스 오른쪽 위 점
 
-			if (FinalMaxVec.x > FinalMinVec.x) {
-				min_x = FinalMinVec.x;
-				max_x = FinalMaxVec.x;
-			}
-			else {
-				min_x = FinalMaxVec.x;
-				max_x = FinalMinVec.x;
-			}
-			if (FinalMaxVec.y > FinalMinVec.y) {
-				min_y = FinalMinVec.y;
-				max_y = FinalMaxVec.y;
-			}
-			else {
-				min_y = FinalMaxVec.y;
-				max_y = FinalMinVec.y;
-			}
-			if (FinalMaxVec.z > FinalMinVec.z) {
-				min_z = FinalMinVec.z;
-				max_z = FinalMaxVec.z;
-			}
-			else {
-				min_z = FinalMaxVec.z;
-				max_z = FinalMinVec.z;
-			}
+			min_x = std::min(FinalMinVec.x, FinalMaxVec.x);
+			max_x = std::max(FinalMinVec.x, FinalMaxVec.x);
+			min_y = std::min(FinalMinVec.y, FinalMaxVec.y);
+			max_y = std::max(FinalMinVec.y, FinalMaxVec.y);
+			min_z = std::min(FinalMinVec.z, FinalMaxVec.z);
+			max_z = std::max(FinalMinVec.z, FinalMaxVec.z);
+
 			// [1] YZ 평면 검사
 			contact = RaytoPlaneYZ(ray_first, ray_last, min_x);
-			if (min_y <= contact.y && contact.y <= max_y) {
-				if (min_z <= contact.z && contact.z <= max_z) {
-					yz_dist = pow(contact.x - ray_first.x, 2) + pow(contact.y - ray_first.y, 2) + pow(contact.z - ray_first.z, 2);
-					contact_distance[i] = yz_dist;
-					is_contact = true;
-					//std::cout << i << "- YZ평면\t" << contact.x << "\t" << contact.y << "\t" << contact.z << std::endl;
-				}
+			if (min_y <= contact.y && contact.y <= max_y && min_z <= contact.z && contact.z <= max_z) {
+				yz_dist = glm::distance(contact, ray_first);
+				contact_distance[i] = yz_dist;
+				is_contact = true;
 			}
 
 			// [2] XZ 평면 검사
 			contact = RaytoPlaneXZ(ray_first, ray_last, min_y);
-			if (min_x <= contact.x && contact.x <= max_x) {
-				if (min_z <= contact.z && contact.z <= max_z) {
-					xz_dist = pow(contact.x - ray_first.x, 2) + pow(contact.y - ray_first.y, 2) + pow(contact.z - ray_first.z, 2);
-					if (contact_distance[i] != 0.0f) {
-						if (xz_dist < contact_distance[i]) {
-							contact_distance[i] = xz_dist;
-							is_contact = true;
-							//std::cout << i << "- XZ평면\t" << contact.x << "\t" << contact.y << "\t" << contact.z << std::endl;
-						}
-					}
-					else {
-						contact_distance[i] = xz_dist;
-						is_contact = true;
-						//std::cout << i << "- XZ평면\t" << contact.x << "\t" << contact.y << "\t" << contact.z << std::endl;
-					}
+			if (min_x <= contact.x && contact.x <= max_x && min_z <= contact.z && contact.z <= max_z) {
+				xz_dist = glm::distance(contact, ray_first);
+				if (contact_distance[i] == 0.0f || xz_dist < contact_distance[i]) {
+					contact_distance[i] = xz_dist;
+					is_contact = true;
 				}
 			}
 
 			// [3] XY 평면 검사
 			contact = RaytoPlaneXY(ray_first, ray_last, min_z);
-			if (min_x <= contact.x && contact.x <= max_x) {
-				if (min_y <= contact.y && contact.y <= max_y) {
-					xy_dist = pow(contact.x - ray_first.x, 2) + pow(contact.y - ray_first.y, 2) + pow(contact.z - ray_first.z, 2);
-					if (contact_distance[i] != 0.0f) {
-						if (xy_dist < contact_distance[i]) {
-							contact_distance[i] = xy_dist;
-							is_contact = true;
-							//std::cout << i << "- XY평면\t" << contact.x << "\t" << contact.y << "\t" << contact.z << std::endl;
-						}
-					}
-					else {
-						contact_distance[i] = xy_dist;
-						is_contact = true;
-						//std::cout << i << "- XY평면\t" << contact.x << "\t" << contact.y << "\t" << contact.z << std::endl;
-					}
+			if (min_x <= contact.x && contact.x <= max_x && min_y <= contact.y && contact.y <= max_y) {
+				xy_dist = glm::distance(contact, ray_first);
+				if (contact_distance[i] == 0.0f || xy_dist < contact_distance[i]) {
+					contact_distance[i] = xy_dist;
+					is_contact = true;
 				}
 			}
 
@@ -675,18 +639,18 @@ void Player::attack_check(std::vector<EnemyBase*>& temp_list, PlayerInfo* player
 		}
 	}
 	int whoisfirst = -1;
-	for (int i = 0;i < alive;i++) { //가장 가까운 좀비 찾기
-		if (contact_distance[i] != 0.0f) {
-			if (mindist > contact_distance[i]) {
-				mindist = contact_distance[i];
-				whoisfirst = i;
-			}
+	for (int i = 0; i < alive; i++) {
+		if (contact_distance[i] != 0.0f && contact_distance[i] < mindist) {
+			mindist = contact_distance[i];
+			whoisfirst = i;
 		}
 	}
 	if (whoisfirst != -1) {
 		aliveEnemy[whoisfirst]->Update_HP(-(ATK + bonus_damage)); //공격력만큼 감소
-		//std::cout << whoisfirst << "\t-\t" << aliveEnemy[whoisfirst]->getHP() << std::endl;
+		hit_detected = true; // Mark that a zombie was hit
 	}
+
+	return hit_detected; // Return whether a hit was detected
 }
 
 glm::vec3 Player::RaytoPlaneXY(glm::vec3 A, glm::vec3 B, float plane)

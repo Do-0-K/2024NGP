@@ -59,6 +59,7 @@ public:
     ~TCPServer();
     void BindAndListen();
     void Execute();
+    void Update();
 
 private:
     SOCKET listen_sock = NULL;
