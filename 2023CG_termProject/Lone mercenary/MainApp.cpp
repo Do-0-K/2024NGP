@@ -121,7 +121,7 @@ void MainApp::next_state()
 			glutSetCursor(GLUT_CURSOR_RIGHT_ARROW);
 			game_state = 결과창;
 			// 결과창 내보내기 전에 서버에게 개별 점수 받기
-			retval = recv(*m_pSock, (char*)score, sizeof(int), 0); //take total score from server
+			//retval = recv(*m_pSock, (char*)score, sizeof(int), 0); //take total score from server //패킷으로 받아오기
 			dynamic_cast<ScoreBoard*>(score_scene)->SetTotalscore(score); //total score set
 			dynamic_cast<ScoreBoard*>(score_scene)->Update_1(); //finally set mesh
 			delete current_scene;
