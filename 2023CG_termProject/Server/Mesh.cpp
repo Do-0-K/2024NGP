@@ -5,7 +5,7 @@
 bool Mesh::box_check = false;
 
 Mesh::Mesh(std::string filename, std::string f_path, int w_size, int h_size) {
-	//Initialize(filename);
+	Initialize(filename);
 	//Init_texture(f_path, w_size, h_size);
 	//ambient = glm::vec3(0.3);
 }

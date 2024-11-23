@@ -37,7 +37,7 @@ bool MainApp::Initialize()
 	pKeyboard->setScene(current_scene);
 
 	// 게임 요소 초기화
-	//MainAppConnect();
+	MainAppConnect();
 
 	return true;
 }

@@ -4,16 +4,20 @@
 
 // Define static member variables
 
-//std::vector<EnemyBase*> TCPServer::enemyList;  // 적 리스트 정의
-//Player* TCPServer::player = nullptr;          // 플레이어 정의 및 초기화
+CRITICAL_SECTION consoleCS; // CriticalSection for console output
 UpdateInfo TCPServer::updateInfo[2];          // 클라이언트 업데이트 정보 정의
 RenderInfo TCPServer::renderInfo[2];          // 클라이언트 렌더링 정보 정의
 
+void SetCursorPosition(int x, int y) {
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	COORD position = { (SHORT)x, (SHORT)y };
+	SetConsoleCursorPosition(hConsole, position);
+}
 
 TCPServer::TCPServer() {
 	// Create player
 	player = new Player(100, 200, 40, 20, 0);
-
+	InitializeCriticalSection(&consoleCS);
 	// Create and initialize enemies
 	for (int i = 0; i < 14; ++i) {
 		enemyList.push_back(new NM_zombie(1200, 1350, 20, 30, 27, 일반));
@@ -22,7 +26,7 @@ TCPServer::TCPServer() {
 TCPServer::~TCPServer() {
 	// Delete player
 	delete player;
-
+	DeleteCriticalSection(&consoleCS);
 
 	// Close all sockets and threads
 	for (SOCKET& client : client_sockets) {
@@ -54,7 +58,7 @@ void TCPServer::BindAndListen() {
 
 	char hostName[256];
 	gethostname(hostName, sizeof(hostName));
-	std::cout << hostName << std::endl;
+	//std::cout << hostName << std::endl;
 
 	hostent* ptr = gethostbyname(hostName);
 	memcpy(&serverAddr.sin_addr, ptr->h_addr_list[0], ptr->h_length);
@@ -62,7 +66,7 @@ void TCPServer::BindAndListen() {
 	char iptest[22];
 
 	inet_ntop(AF_INET, &serverAddr.sin_addr, iptest, sizeof(iptest));
-	printf("서버의 ip주소 - %s\n", iptest);
+	//printf("서버의 ip주소 - %s\n", iptest);
 
 	if (bind(listen_sock, (sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
 		std::cout << "Binding failed" << std::endl;
@@ -77,7 +81,7 @@ void TCPServer::BindAndListen() {
 		WSACleanup();
 		exit(1);
 	}
-	std::cout << "Server started" << std::endl;
+	
 }
 
 void TCPServer::Execute() {
@@ -106,9 +110,9 @@ void TCPServer::AcceptClients() {
 			std::cerr << "Accept failed: " << WSAGetLastError() << std::endl;
 			continue;
 		}
-
-		std::cout << "Client connected. Address: " << inet_ntoa(clientaddr.sin_addr)
-			<< ", Port: " << ntohs(clientaddr.sin_port) << std::endl;
+		cout << "클라이언트[" << clientCount << "]" << "가 입장했습니다" << endl;
+		/*std::cout << "Client connected. Address: " << inet_ntoa(clientaddr.sin_addr)
+			<< ", Port: " << ntohs(clientaddr.sin_port) << std::endl;*/
 
 		client_sockets.push_back(clientSocket);
 
@@ -124,6 +128,8 @@ void TCPServer::AcceptClients() {
 	}
 
 	closesocket(listen_sock);
+	EnterCriticalSection(&consoleCS);
+	SetCursorPosition(0, 4);
 	std::cout << "Two clients connected. No longer accepting new connections." << std::endl;
 }
 
@@ -161,50 +167,49 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
 	int clientIndex = data->clientIndex;
 	TCPServer* server = data->serverInstance; // Access the TCPServer instance
 	delete data; // Free the dynamically allocated ThreadArg
-
+	int clientRow = 6 + (clientIndex * 8); // 클라이언트별로 8행씩 차지
 	/*UpdateInfo updateInfo;
 	RenderInfo renderInfo;*/
 	int recvSize;
-
-	// Initialize Player and Enemy List
-	
-	//Player* player  = new Player(100, 200, 40, 20, 0);
-	
-	
-
-	// Create and initialize zombies
-	
-
+	PlayerInfo playerinfo;
 	// Main thread loop
 	while (true) {
 		// Receive PlayerInfo structure from client
-		recvSize = recv(clientSocket, (char*)&server->updateInfo[clientIndex], sizeof(server->updateInfo[clientIndex]), MSG_WAITALL);
+		//recvSize = recv(clientSocket, (char*)&server->updateInfo[clientIndex], sizeof(server->updateInfo[clientIndex]), MSG_WAITALL);
+		recvSize = recv(clientSocket, (char*)&playerinfo, sizeof(playerinfo), MSG_WAITALL);
 		if (recvSize <= 0) {
+			EnterCriticalSection(&consoleCS);
+			SetCursorPosition(0, 5);
 			std::cout << "Client " << clientIndex << " disconnected or error occurred. Closing connection." << std::endl;
+			LeaveCriticalSection(&consoleCS);
 			break;
 		}
-
+		EnterCriticalSection(&consoleCS);
+		SetCursorPosition(0, clientRow);
+		std::cout << "클라이언트[:" << clientIndex+1<<"] 좌표입니다"<< std::endl;
+		std::cout << "플레이어 좌표 x: " << playerinfo.cameraEYE.x << std::endl;
+		std::cout << "플레이어 좌표 y: " << playerinfo.cameraEYE.y << std::endl;
+		std::cout << "플레이어 좌표 z: " << playerinfo.cameraEYE.z << std::endl;
+		std::cout << "좀비의 객체 수: " << server->enemyList.size() << std::endl;
+		std::cout << "좀비의 x좌표 값: " << server->enemyList[0]->getLoc().x << std::endl;
+		std::cout << "좀비의 좌표 값: " << server->enemyList[0]->getLoc().y << std::endl;
+		std::cout << "좀비의 z좌표 값: " << server->enemyList[0]->getLoc().z << std::endl;
+		LeaveCriticalSection(&consoleCS);
 		// Check if player is attacking (flag == 1)
-		if (server->updateInfo[clientIndex].flag == 1)
+		if (server->updateInfo[clientIndex].flag == 0)
 		{
-			std::cout << "Player " << clientIndex << " is attacking!" << std::endl;
+			//std::cout << "Player " << clientIndex << " is attacking!" << std::endl;
 
 			// Check collisions between player's attack and zombies
 			for (auto& zombie : server->enemyList) {
 				PlayerInfo temp;
-				temp.cameraEYE = server->updateInfo[clientIndex].cameraEYE;
-				temp.Angle = server->updateInfo[clientIndex].cameraangle;
-				if (!zombie->Death_check() && server->player->attack_check(server->enemyList, &temp)) {
-					std::cout << "Zombie hit! Remaining HP: " << zombie->getHP() << std::endl;		//이 부분에서 맞은 좀비 체력 깎기
+				temp.cameraEYE = updateInfo[clientIndex].cameraEYE;
+				temp.Angle = updateInfo[clientIndex].cameraangle;
 
-					// If zombie dies, mark it
-					if (zombie->Death_check()) {					//좀비 죽으면 리스트 조정하기
-						std::cout << "Zombie has died!" << std::endl;
-						
-					}
-				}
+				// 적 리스트와 플레이어 정보로 공격 체크
+				server->player->attack_check(server->enemyList, &temp);
 			}
-			continue;
+			
 		}
 		else
 		{
@@ -212,29 +217,34 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
 			//플레이어가 움직일 때 
 		}
 	
+		// 적 리스트 관리 및 새 적 생성
+		for (int i = 0; i < server->enemyList.size(); ++i) {
+			if (server->enemyList[i]->Death_check()) {
+				delete server->enemyList[i];
+				server->enemyList.erase(server->enemyList.begin() + i);
+				--i;
 
-	//// Update active enemies list in Field-like logic
-	//int alive = 0;
-	//EnemyBase* aliveEnemy[MAX_ALIVE];
-	//bool updateFirst = false;
+				if (server->enemyList.size() < MAX_ENEMY_COUNT) {
+					server->enemyList.push_back(new NM_zombie(1200, 1350, 20, 30, 27, 일반));
+				}
+			}
+		}
+	
 
-	//for (int i = 0; i < enemyList.size(); ++i) {
-	//    if (!enemyList[i]->Death_check()) {
-	//        if (!updateFirst) {
-	//            updateFirst = true;
-	//        }
-	//        aliveEnemy[alive++] = enemyList[i];
-	//        if (MAX_ALIVE == alive) {
-	//            break;
-	//        }
-	//    }
-	//}
+		// 현재 살아 있는 적의 수 계산 및 반영
+		int aliveCount = 0;
+		for (const auto& enemy : server->enemyList) {
+			if (!enemy->Death_check()) {
+				++aliveCount;
+			}
+		}
+		renderInfo[clientIndex].alive_num = aliveCount;
 
 	//// Prepare renderInfo to send back to the client
 	FillRenderInfo(server->renderInfo[clientIndex], server->enemyList, server->player);
 
 	// Send renderInfo back to the client
-		send(clientSocket, (char*)&renderInfo, sizeof(renderInfo), 0);
+		//send(clientSocket, (char*)&renderInfo, sizeof(renderInfo), 0);
 	}
 
 	// Cleanup

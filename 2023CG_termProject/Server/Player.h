@@ -42,7 +42,7 @@ public:
 
 
 
-	bool attack_check(std::vector<EnemyBase*>& temp_list, PlayerInfo* playerinfo);	// 광선이 좀비랑 닿았나?
+	void attack_check(std::vector<EnemyBase*>& temp_list, PlayerInfo* playerinfo);	// 광선이 좀비랑 닿았나?
 	glm::vec3 RaytoPlaneXY(glm::vec3,glm::vec3,float);			// XY평면 투영
 	glm::vec3 RaytoPlaneXZ(glm::vec3,glm::vec3,float);			// XZ평면 투영
 	glm::vec3 RaytoPlaneYZ(glm::vec3,glm::vec3,float);			// YZ평면 투영

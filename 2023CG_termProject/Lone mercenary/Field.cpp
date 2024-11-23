@@ -50,9 +50,9 @@ void Field::Update()
 	mCamera->setCameraAngle(dynamic_cast<Player*>(mPlayer)->getRot());
 	// 여기서 서버에게 위치랑 필요한거 넘기기
 
-	/*
+	
 	PlayerInfo playerInfo{ mCamera->getEYE(), mCamera->getAngle() };
-	// 내 위치 보내기
+	/* 내 위치 보내기*/
 
 	int retval = send(*m_pSock, (char*)&playerInfo, sizeof(playerInfo), 0);
 
@@ -60,7 +60,7 @@ void Field::Update()
 		std::cout << "전송 실패" << std::endl;
 		exit(1);
 	}
-	*/
+	
 	// 총기 위치 변경
 	dynamic_cast<Player*>(mPlayer)->take_out_Wep();
 	dynamic_cast<Player*>(mPlayer)->getWeapon()->setLoc(dynamic_cast<Player*>(mPlayer)->getLoc());

@@ -24,7 +24,8 @@
 
 
 
-
+using namespace std;
+using namespace glm;
 #include "ENUM.h"
 
 //#include "stb_image.h"

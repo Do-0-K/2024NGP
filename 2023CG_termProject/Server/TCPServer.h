@@ -9,7 +9,7 @@
 
 
 #define Portnum 25715
-
+#define MAX_ENEMY_COUNT 100  // 최대 적 생성 개수
 class TCPServer;
 class Player;
 #pragma pack(1)
