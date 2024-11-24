@@ -17,9 +17,7 @@ public:
 		
 	}
 
-
-
-
+	virtual void walk_ani(int n) {};
 	virtual void attack();
 	
 	virtual void setLoc(glm::vec3 loc);

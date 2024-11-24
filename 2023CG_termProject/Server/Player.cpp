@@ -84,10 +84,17 @@ Weapon* Player::getWeapon() const
 glm::vec3 CalculateAt(const glm::vec3& eye, const glm::vec2& angle) {
 	glm::vec3 at;
 
-	// Calculate direction vector
-	at.x = cos(glm::radians(angle.y)) * cos(glm::radians(angle.x));
-	at.y = sin(glm::radians(angle.y));
-	at.z = cos(glm::radians(angle.y)) * sin(glm::radians(angle.x));
+	//// Calculate direction vector
+	//at.x = cos(glm::radians(angle.y)) * cos(glm::radians(angle.x));
+	//at.y = sin(glm::radians(angle.y));
+	//at.z = cos(glm::radians(angle.y)) * sin(glm::radians(angle.x));
+    //회전 각과 AT에 따른 EYE를 구한다
+    float xz_dis;
+    xz_dis = fabs(40 * glm::cos(glm::radians(angle.y)));
+
+    at.x = eye.x + (xz_dis * glm::cos(glm::radians(angle.x)));
+    at.y = eye.y + (40 * glm::sin(glm::radians(angle.y)));
+    at.z = eye.z + (xz_dis * glm::sin(glm::radians(angle.x)));
 
 	// The "at" point in world space
 	glm::vec3 atPoint = eye + at;
@@ -100,7 +107,7 @@ void Player::attack_check(std::vector<EnemyBase*>& temp_list, PlayerInfo* player
     glm::vec3 ray_last = glm::vec3(CalculateAt(playerinfo->cameraEYE, playerinfo->Angle));
     glm::vec3 ray = ray_last - ray_first;
 
-    float mindist = 0.0f;
+    float mindist = 200.0f;
     switch (weapon) { // 무기에 따른 사거리 설정
     case 나이프:
         mindist = 200.0f;

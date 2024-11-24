@@ -58,13 +58,18 @@ public:
     void Update();
     void AcceptClients();
     static DWORD WINAPI ClientThread(LPVOID arg);
-
+    void FillRenderInfo(RenderInfo& renderInfo, const std::vector<EnemyBase*>& enemyList, Player* player);
 private:
+    
     SOCKET listen_sock = NULL;
     std::vector<SOCKET> client_sockets;
     std::vector<HANDLE> client_threads;
-    int clientCount = 0;
+    std::vector<HANDLE> client_events; // Event objects for thread synchronization
 
+
+    int clientCount = 0;
+    CRITICAL_SECTION consoleCS; // Critical section for console output
+   int max_enemycount = 14;
     std::vector<EnemyBase*> enemyList;  // Enemy list
     Player* player;                     // Player instance
     static UpdateInfo updateInfo[2];           // Update information for 2 clients
