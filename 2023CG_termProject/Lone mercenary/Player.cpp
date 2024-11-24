@@ -1176,6 +1176,12 @@ void Player::attack_send(int state)
 	player_state = state; //상태 지정
 	//int retval = send(*pSock, (char*)&player_state, sizeof(player_state), 0);
 }
+
+int Player::Get_flag()
+{
+	return player_state;
+}
+
 //===========================================================
 
 bool Player::getItemapp(int n)

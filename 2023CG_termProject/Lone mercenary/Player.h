@@ -61,6 +61,8 @@ public:
 	bool do_reload_ani();
 	void knife_AT_ani();
 	bool check_reload_ammo();
+	
+	int Get_flag();
 
 	//Player & Enemy 충돌은 서버에서 관리
 	//void attack_check(std::vector<EnemyBase*>&, CameraObj*);	// 광선이 좀비랑 닿았나?
