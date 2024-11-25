@@ -96,7 +96,7 @@ void TCPServer::Execute() {
 		// Update game state
 		Update();
 
-		// Reset all events to allow threads to continue
+		// Reset all events 
 		for (HANDLE event : client_events) {
 			ResetEvent(event);
 		}
@@ -164,6 +164,9 @@ void TCPServer::Update() {
 		renderInfo[0].opposite = { updateInfo[1].cameraEYE, updateInfo[1].cameraangle };
 		renderInfo[1].opposite = { updateInfo[0].cameraEYE, updateInfo[0].cameraangle };
 	}
+	//=========================================================start Dong-ki-wow~
+	
+
 
 	// Print current state to console
 	EnterCriticalSection(&consoleCS);
