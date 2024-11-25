@@ -68,6 +68,7 @@ NM_zombie::NM_zombie(float hp, float max, float spd, float def, float atk, int t
 		cur_loc = glm::vec3(z_rnd(dre), 0, -100);
 		break;
 	}
+	cur_loc = glm::vec3(0, 0, 0);
 	cur_rot = glm::vec3(0.0f);
 
 	switch (z_type) {
@@ -166,6 +167,50 @@ NM_zombie::~NM_zombie()
 		delete leg[1];
 		leg[1] = nullptr;
 	}
+}
+
+
+void NM_zombie::walk_ani(int n)
+{
+	glm::vec3 z_pos = glm::vec3(cur_loc.x, 0, cur_loc.z);
+	glm::vec3 p_pos = glm::vec3(dynamic_cast<Player*>(mPlayer)->getLoc().x, 0, dynamic_cast<Player*>(mPlayer)->getLoc().z);
+
+	float slope;
+
+	if (z_pos.x == p_pos.x) {
+		slope = (z_pos.z - p_pos.z) / (z_pos.x - (p_pos.x + 0.0000000001));
+	}
+	else
+		slope = (z_pos.z - p_pos.z) / (z_pos.x - p_pos.x);
+
+	float angle = glm::atan(slope);
+	float degree = angle * 180 / glm::pi<float>();
+
+	if (z_pos.x > p_pos.x)
+		degree += 180;
+
+
+	cur_rot.x = degree;
+	glm::vec3 way = glm::normalize(glm::vec3(glm::cos(glm::radians(cur_rot.x)), 0, glm::sin(glm::radians(cur_rot.x))));
+	if (n == 0)
+		cur_loc += (speed * way) / 60.0f;
+	else
+		cur_loc -= (speed * way) / 60.0f;
+	if (glm::distance(cur_loc, p_pos) < 3)
+		cur_loc -= (speed * way) / 60.0f;
+
+	head->setLoc(cur_loc);
+	head->setRot(cur_rot);
+	body->setLoc(cur_loc);
+	body->setRot(cur_rot);
+	arm[0]->setLoc(cur_loc);
+	arm[0]->setRot(cur_rot);
+	arm[1]->setLoc(cur_loc);
+	arm[1]->setRot(cur_rot);
+	leg[0]->setLoc(cur_loc);
+	leg[0]->setRot(cur_rot);
+	leg[1]->setLoc(cur_loc);
+	leg[1]->setRot(cur_rot);
 }
 
 // opposite용 행렬 업데이트 함수

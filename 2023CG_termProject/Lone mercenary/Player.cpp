@@ -207,7 +207,7 @@ void Player::animation()
 	}
 }
 
-void Player::animi_rot(int garo,int sero) {		// 변수 이름??
+void Player::animi_rot(int garo, int sero) {		// 변수 이름??
 	//마우스 움직임에 따른 각도 변환
 	if (garo > 0) {
 		cur_rot.x += mousesense * garo;
@@ -383,7 +383,7 @@ void Player::take_out_Wep()
 	}
 }
 
-void Player::set_item(int x,int y)
+void Player::set_item(int x, int y)
 {
 	if (274 <= x && x <= 623) {
 		if (12 <= y && y <= 355) {
@@ -561,7 +561,7 @@ bool Player::GetItem()
 //	glm::vec3 FinalMinVec = glm::vec3(1.0f);
 //	glm::vec3 FinalMaxVec = glm::vec3(1.0f);
 //	glm::mat4 toWorld = glm::mat4(1.0f);
-//	float contact_distance[MAX_ALIVE] = {0.0f}; //거리 담을 곳 
+//	float contact_distance[MAX_ALIVE] = { 0.0f }; //거리 담을 곳 
 //	float mindist = 0.0f;
 //	bool is_contact = false;
 //	int bonus_damage = 0;
@@ -1132,7 +1132,7 @@ bool Player::GetItem()
 //		}
 //	}
 //	int whoisfirst = -1;
-//	for (int i = 0;i < alive;i++) { //가장 가까운 좀비 찾기
+//	for (int i = 0; i < alive; i++) { //가장 가까운 좀비 찾기
 //		if (contact_distance[i] != 0.0f) {
 //			if (mindist > contact_distance[i]) {
 //				mindist = contact_distance[i];
@@ -1145,7 +1145,7 @@ bool Player::GetItem()
 //		//std::cout << whoisfirst << "\t-\t" << aliveEnemy[whoisfirst]->getHP() << std::endl;
 //	}
 //}
-//
+
 //glm::vec3 Player::RaytoPlaneXY(glm::vec3 A, glm::vec3 B, float plane)
 //{
 //	float ratio = (B.z - plane) / (B.z - A.z);

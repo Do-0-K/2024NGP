@@ -37,7 +37,7 @@ bool MainApp::Initialize()
 	pKeyboard->setScene(current_scene);
 
 	// 게임 요소 초기화
-	//MainAppConnect();
+	MainAppConnect();
 
 	return true;
 }
@@ -175,7 +175,8 @@ void MainApp::MainAppConnect()
 	serveraddr.sin_family = AF_INET;
 
 	// 호스트의 IP 주소를 알아내기
-	const char* hostName = "DESKTOP-SNG2JRJ";// 서버로 사용할 호스트 이름
+	//const char* hostName = "DESKTOP-SNG2JRJ";// 서버로 사용할 호스트 이름
+	const char* hostName = "농담이";
 	hostent* ptr = gethostbyname(hostName);
 	if (ptr == nullptr) {
 		std::cout << "can't find Hostname" << std::endl;

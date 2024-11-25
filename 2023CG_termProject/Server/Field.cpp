@@ -62,3 +62,49 @@ bool Field::check_zomcol(EnemyBase* t_list[], int myNum)
 	}
 	return false;
 }
+
+void Field::Update()
+{
+	
+	//===========================================================
+	int alive{};
+	EnemyBase* aliveEnemy[MAX_ALIVE];
+	bool update_first = false;
+	for (int i = first_zom; i < enemy_list.size(); ++i) {
+		if (not enemy_list[i]->Death_check()) {
+			if (not update_first) {
+				first_zom = i;
+				update_first = true;
+			}
+			aliveEnemy[alive++] = enemy_list[i];
+			if (MAX_ALIVE == alive)
+				break;
+		}
+	}
+
+
+
+	//for (int i = 0; i < alive; ++i) {
+	//	aliveEnemy[i]->setPlayerLoc(mPlayer);
+	//	if (dynamic_cast<NM_zombie*>(aliveEnemy[i])->getlarm()->collision_check(*mField->gethouse_1())
+	//		|| dynamic_cast<NM_zombie*>(aliveEnemy[i])->getlarm()->collision_check(*mField->gethouse_2())
+	//		|| dynamic_cast<NM_zombie*>(aliveEnemy[i])->getlarm()->collision_check(*mField->gethouse_3())
+	//		|| dynamic_cast<NM_zombie*>(aliveEnemy[i])->getlarm()->collision_check(*mField->gethouse_4())
+	//		|| check_zomcol(aliveEnemy, i))
+	//		aliveEnemy[i]->walk_ani(1);
+	//	else
+	//		aliveEnemy[i]->walk_ani(0);
+	//	aliveEnemy[i]->attack();
+	//	dynamic_cast<NM_zombie*>(aliveEnemy[i])->z_heal(enemy_list);
+	//	dynamic_cast<NM_zombie*>(aliveEnemy[i])->z_boom();
+	//}
+	//==============================================================================
+
+
+	
+	item->check_collision();
+	item->check_time();
+	item->rot_ani();
+	//====================================================
+
+}

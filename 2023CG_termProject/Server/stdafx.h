@@ -24,7 +24,8 @@
 
 
 
-
+using namespace std;
+using namespace glm;
 #include "ENUM.h"
 
 //#include "stb_image.h"
@@ -32,4 +33,4 @@
 #pragma comment(lib, "ws2_32")
 
 #define MAX_ALIVE 14
-#define MAX_ZOMBIE 140
+#define MAX_ZOMBIE 14

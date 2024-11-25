@@ -10,6 +10,11 @@ glm::vec3 EnemyBase::getLoc()
 	return cur_loc;
 }
 
+glm::vec2 EnemyBase::getRot()
+{
+	return cur_rot;
+}
+
 void EnemyBase::attack()
 {
 	cur_time = clock();

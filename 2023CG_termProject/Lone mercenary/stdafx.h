@@ -25,7 +25,7 @@
 #include "ENUM.h"
 #include "fmod.hpp"
 #include "fmod_errors.h"
-//#include "stb_image.h"
+#include "stb_image.h"
 
 #pragma comment(lib, "ws2_32")
 
