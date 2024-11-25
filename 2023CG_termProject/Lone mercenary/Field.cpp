@@ -9,8 +9,19 @@ struct PlayerInfo {
 	glm::vec2 Angle;
 };
 
+struct ObjectInfo {
+	int HP;
+	glm::vec3 Pos;
+	glm::vec2 Rot;
+};
+
 struct RenderInfo {
+	int HP;
+	int ammo;
 	PlayerInfo opposite;
+	ObjectInfo alive_enemy[14];
+	ObjectInfo box;
+	int remainTime;
 };
 #pragma pack()
 
@@ -50,7 +61,7 @@ void Field::Update()
 	mCamera->setCameraAngle(dynamic_cast<Player*>(mPlayer)->getRot());
 	// 여기서 서버에게 위치랑 필요한거 넘기기
 
-	
+
 	PlayerInfo playerInfo{ mCamera->getEYE(), mCamera->getAngle() };
 	/* 내 위치 보내기*/
 
@@ -60,7 +71,7 @@ void Field::Update()
 		std::cout << "전송 실패" << std::endl;
 		exit(1);
 	}
-	
+
 	// 총기 위치 변경
 	dynamic_cast<Player*>(mPlayer)->take_out_Wep();
 	dynamic_cast<Player*>(mPlayer)->getWeapon()->setLoc(dynamic_cast<Player*>(mPlayer)->getLoc());
@@ -68,7 +79,7 @@ void Field::Update()
 	dynamic_cast<Player*>(mPlayer)->reload_ani();
 	dynamic_cast<Player*>(mPlayer)->knife_AT_ani();
 
-	/*
+
 	RenderInfo renderInfo;
 	retval = recv(*m_pSock, (char*)&renderInfo, sizeof(RenderInfo), MSG_WAITALL);
 	if (retval == 0) {
@@ -84,12 +95,12 @@ void Field::Update()
 	m_pOpposite->setRot(oppAngle);
 
 	m_pOpposite->UpdateMatrix();
-	*/
 
-	m_pOpposite->setLoc(tempOppEYE);
+
+	/*m_pOpposite->setLoc(tempOppEYE);
 	m_pOpposite->setRot(tempOppAngle);
 
-	m_pOpposite->UpdateMatrix();
+	m_pOpposite->UpdateMatrix();*/
 	// 서버에서 받을 예정, 준비 되면 삭제
 	//===========================================================
 	/*int alive{};

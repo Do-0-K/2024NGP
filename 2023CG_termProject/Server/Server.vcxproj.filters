@@ -57,9 +57,6 @@
     <ClInclude Include="ItemBox.h">
       <Filter>소스 파일\Player,Item,Enemy\itembox</Filter>
     </ClInclude>
-    <ClInclude Include="..\Lone mercenary\CharacterBase.h">
-      <Filter>소스 파일\Player,Item,Enemy</Filter>
-    </ClInclude>
     <ClInclude Include="Enemy.h">
       <Filter>소스 파일\Player,Item,Enemy\Enemy</Filter>
     </ClInclude>
@@ -84,6 +81,9 @@
     <ClInclude Include="FieldMap.h">
       <Filter>소스 파일\fieldmap</Filter>
     </ClInclude>
+    <ClInclude Include="CharacterBase.h">
+      <Filter>소스 파일\Player,Item,Enemy</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -100,9 +100,6 @@
     </ClCompile>
     <ClCompile Include="ItemBox.cpp">
       <Filter>소스 파일\Player,Item,Enemy\itembox</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Lone mercenary\CharacterBase.cpp">
-      <Filter>소스 파일\Player,Item,Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Enemy.cpp">
       <Filter>소스 파일\Player,Item,Enemy\Enemy</Filter>
@@ -121,6 +118,9 @@
     </ClCompile>
     <ClCompile Include="FieldMap.cpp">
       <Filter>소스 파일\fieldmap</Filter>
+    </ClCompile>
+    <ClCompile Include="CharacterBase.cpp">
+      <Filter>소스 파일\Player,Item,Enemy</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

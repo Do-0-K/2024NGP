@@ -15,6 +15,7 @@ public:
 	virtual bool Death_check();					// 체력이 0이하면 true 반환
 
 	float getHP();
+	float getNorHPPercent();
 protected:
 	float HP{};				// 체력
 	float MAXHP{};			// 최대 체력

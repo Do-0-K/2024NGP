@@ -29,7 +29,6 @@ struct RenderInfo {         // The packet which server sends to client
     int ammo;
     PlayerInfo opposite;
     ObjectInfo alive_enemy[14];
-    int alive_num;
     ObjectInfo box;
     int remainTime;
 };
@@ -41,6 +40,7 @@ struct UpdateInfo {         // The packet which client sends to server
     glm::vec2 cameraangle;
     int ammo;
 };
+#pragma pack()
 
 struct ThreadArg {
     SOCKET clientSocket;
@@ -65,7 +65,9 @@ private:
     std::vector<SOCKET> client_sockets;
     std::vector<HANDLE> client_threads;
     std::vector<HANDLE> client_events; // Event objects for thread synchronization
-
+    
+    // Event for synchronization
+    std::vector<HANDLE> m_hUpdateEvent;  // 업데이트 완료 시 신호
 
     int clientCount = 0;
     CRITICAL_SECTION consoleCS; // Critical section for console output
