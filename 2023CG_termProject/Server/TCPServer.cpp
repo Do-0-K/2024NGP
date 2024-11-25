@@ -1,11 +1,7 @@
 #include "TCPServer.h"
 
-#pragma pack(1)
-struct PlayerInfo {
-    glm::vec3 cameraEYE;
-    glm::vec2 Angle;
-};
-#pragma pack()
+
+
 
 TCPServer::TCPServer()
 {
@@ -32,6 +28,7 @@ void TCPServer::BindAndListen() {
 
     char hostName[256];
     gethostname(hostName, sizeof(hostName));
+    std::cout << hostName << std::endl;
 
     hostent* ptr = gethostbyname(hostName);
     memcpy(&serverAddr.sin_addr, ptr->h_addr_list[0], ptr->h_length);
@@ -62,69 +59,78 @@ void TCPServer::Execute() {
     std::cout << "Waiting for clients to connect..." << std::endl;
     AcceptClients();
     // 이 함수 두명 받으면 끝인데 서버 유지 되나요?
+    while (1) {
+        //인게임 루프 단계
+       // Wait
+            //업데이트 할 때 플레이어 체력,남은 시간, 좀비들 움직임
+    };
 }
 
 // 이렇게 하면 소켓 살아있나요?
 void TCPServer::AcceptClients() {
-    struct sockaddr_in clientaddr;
-    int addrlen;
-    while (clientCount < 2) {  // Accept only two clients
-        // 이거 남아있는지 확인이 필요한데
+    sockaddr_in clientaddr;
+    int addrlen = sizeof(clientaddr);
+
+    while (clientCount < 2) {
         SOCKET clientSocket = accept(listen_sock, (struct sockaddr*)&clientaddr, &addrlen);
+
         if (clientSocket == INVALID_SOCKET) {
-            std::cout << "Accept failed." << std::endl;
+            std::cerr << "Accept failed: " << WSAGetLastError() << std::endl;
             continue;
         }
-        std::cout << "Client connected." << std::endl;
+
+        std::cout << "Client connected. Address: " << inet_ntoa(clientaddr.sin_addr)
+            << ", Port: " << ntohs(clientaddr.sin_port) << std::endl;
 
         client_sockets.push_back(clientSocket);
-        HANDLE clientThread = CreateThread(NULL, 0, ClientThread, (LPVOID)clientSocket, 0, NULL);
-        client_threads.push_back(clientThread);
+    
 
+        // Prepare ThreadArg
+        ThreadArg* data = new ThreadArg{ clientSocket, clientCount };
+
+        // Pass the ThreadArg to the thread
+        HANDLE clientThread = CreateThread(NULL,0,ClientThread,data,0,NULL);
+
+        client_threads.push_back(clientThread);
         ++clientCount;
     }
 
-    closesocket(listen_sock);  // Stop accepting new connections
+    closesocket(listen_sock);
     std::cout << "Two clients connected. No longer accepting new connections." << std::endl;
 }
-
 // 이건 아직 미완이죠?
-DWORD WINAPI TCPServer::ClientThread(LPVOID clientSocket) {
-    PlayerInfo playerinfo;
-    SOCKET client = (SOCKET)clientSocket;
-    char buffer[1024];
+// 인자에 다른 클라이언트의 playerinfo를 받을 수 있게 구조체를 해야됨. 
+DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
+    ThreadArg* data = static_cast<ThreadArg*>(arg);
+    SOCKET clientSocket = data->clientSocket;
+    int clientIndex = data->clientIndex;
+    delete data; // Free the dynamically allocated ThreadArg
+
+    UpdateInfo updateInfo;
+    RenderInfo rederinfo;
     int recvSize;
 
-    // PlayerInfo 받는게 안에 있는데 버퍼에는 뭘 받는거? 
-    while ((recvSize = recv(client, buffer, sizeof(buffer) - 1, 0)) > 0) {
-        buffer[recvSize] = '\0';
+    while (true) {
+        // Receive PlayerInfo structure from client
+        recvSize = recv(clientSocket, (char*)&updateInfo, sizeof(updateInfo), MSG_WAITALL);
+        if (recvSize <= 0) {
+            std::cout << "Client " << clientIndex << " disconnected or error occurred. Closing connection." << std::endl;
+            break;
+        }
 
-        // Display received vec3 position data from client
-        std::cout << "Received vec3 position from client: " << buffer << std::endl;
+        //공격 부분은 여기서 관리 공격 여부 판단해서 좀비리스트들 중에서 누가 맞았는지 판별하고 체력 업데이트 시키고 그 정보?를 다시 send()한다
+        // Print received PlayerInfo
+       
+        std::cout << "  HP: (" << updateInfo.flag << std::endl;
 
-        // Echo the data back to the client
-        //send(client, buffer, recvSize, 0);
-        recv(client, (char*)&playerinfo, sizeof(playerinfo), 0);
+        // Echo back to the same client for testing
+        send(clientSocket, (char*)&rederinfo, sizeof(rederinfo), 0);
     }
-    //glm::vec3 position;
-    //int recvSize;
 
-    //while ((recvSize = recv(client, reinterpret_cast<char*>(&position), sizeof(position), 0)) > 0) {
-    //    // Display the received x, y, and z values
-    //    std::cout << "Received vec3 position from client: "
-    //        << "x = " << position.x << ", "
-    //        << "y = " << position.y << ", "
-    //        << "z = " << position.z << std::endl;
-
-    //   
-    //    send(client, reinterpret_cast<const char*>(&position), sizeof(position), 0);
-    //}
-
-
-    std::cout << "Client disconnected." << std::endl;
-    closesocket(client);
+    closesocket(clientSocket);
     return 0;
 }
+
 
 TCPServer::~TCPServer() {
     for (SOCKET& client : client_sockets) {

@@ -3,7 +3,7 @@
 ScoreBoard::ScoreBoard(CubeMap* t_cube, std::vector<EnemyBase*>& t_list, GameTimer* t_timer, CameraObj* t_camera)
 	: mCubemap(t_cube), list(t_list), mTimer(t_timer), camera(t_camera)
 {
-	
+
 
 	back = new Mesh("obj_source\\ui\\timer\\background.obj", "obj_source\\ui\\timer\\background.png", 1024, 1024);
 	back->init_scale(0.005);
@@ -85,6 +85,7 @@ ScoreBoard::~ScoreBoard()
 
 void ScoreBoard::Update_1()
 {
+	glViewport(0, 0, 1280, 720);
 	camera->setCameraAngle(glm::vec2(0, 0));
 	camera->setCameraEYE(glm::vec3(0, 0, 0));
 

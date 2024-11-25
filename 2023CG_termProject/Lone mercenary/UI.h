@@ -6,9 +6,9 @@ class UI {
 public:
 	UI(CharacterBase*, GameTimer*);
 	~UI();
-	
+
 	void Render();
-	void Update();
+	void Update(int nRemainTimer);
 
 	static int h100;
 	static int h10;

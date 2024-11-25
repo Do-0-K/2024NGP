@@ -8,7 +8,7 @@ int GameTimer::remaining_time = 0;
 GameTimer::GameTimer(CharacterBase* t_player)
 	: mPlayer(t_player)
 {
-	start_time = clock();
+	//start_time = clock();
 	remaining_time = 180;	//180√ 
 
 	back = new Mesh("obj_source\\ui\\timer\\background.obj", "obj_source\\ui\\timer\\background.png", 1024, 1024);
@@ -61,11 +61,12 @@ bool GameTimer::check_end()
 	return false;
 }
 
-void GameTimer::Update()
+void GameTimer::Update(int nTime)
 {
-	cur_time = clock();
-	d_time = static_cast<int>((cur_time - start_time) / CLOCKS_PER_SEC);
-	int render_time = remaining_time - d_time;
+	//cur_time = clock();
+	//d_time = static_cast<int>((cur_time - start_time) / CLOCKS_PER_SEC);
+	//int render_time = remaining_time - d_time;
+	int render_time = remaining_time = nTime;
 	if (render_time / 100 != p_num100) {
 		switch (render_time / 100) {
 		case 0:
@@ -197,5 +198,6 @@ void GameTimer::Render()
 
 int GameTimer::getremaining()
 {
-	return remaining_time - d_time;
+	//return remaining_time - d_time;
+	return remaining_time;
 }

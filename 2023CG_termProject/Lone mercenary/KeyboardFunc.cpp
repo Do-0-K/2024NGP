@@ -35,9 +35,9 @@ void KeyboardFunc::Keyboard(unsigned char key, int x, int y)
 		case 'd':
 			dynamic_cast<Player*>(dynamic_cast<Field*>(mScene)->getPlayer())->setMove('d', true);
 			break;
-		//case 27:	// ESC 그 잘난 김도영이 해냈습니다.
-		//	glutLeaveMainLoop();
-		//	break;
+		case 27:
+			glutLeaveMainLoop();
+			break;
 		case '1':
 			dynamic_cast<Player*>(dynamic_cast<Field*>(mScene)->getPlayer())->setWeapon('1');
 			break;
@@ -81,9 +81,13 @@ void KeyboardFunc::Keyboard(unsigned char key, int x, int y)
 				dynamic_cast<Field*>(mScene)->getList()[i]->Update_HP(-9999999);
 			}
 			break;
+		case 'm':
+		case 'M':
+			dynamic_cast<Field*>(mScene)->togleMinimap();
+			break;
 		}
 	}
-	glutPostRedisplay();		// ???
+	//glutPostRedisplay();		// ???
 }
 
 void KeyboardFunc::KeyboardUp(unsigned char key, int x, int y)
@@ -104,7 +108,7 @@ void KeyboardFunc::KeyboardUp(unsigned char key, int x, int y)
 			break;
 		}
 	}
-	glutPostRedisplay();		// ???
+	//glutPostRedisplay();		// ???
 }
 
 void KeyboardFunc::setGame_stete(int n)
