@@ -77,6 +77,7 @@ public:
 	glm::vec2 getWepRot();			// 현재 바라보는 방향에 맞춰 총기위치 지정하기
 
 	Weapon* getWeapon() const;		// 내가 들고 있는 무기 정보 받기
+	bool GetItem(); //시작 아이템 선택 여부 받기
 	int Weapon();
 	bool getItemapp(int n);
 };
