@@ -84,11 +84,6 @@ Weapon* Player::getWeapon() const
 glm::vec3 CalculateAt(const glm::vec3& eye, const glm::vec2& angle) {
 	glm::vec3 at;
 
-	//// Calculate direction vector
-	//at.x = cos(glm::radians(angle.y)) * cos(glm::radians(angle.x));
-	//at.y = sin(glm::radians(angle.y));
-	//at.z = cos(glm::radians(angle.y)) * sin(glm::radians(angle.x));
-    //회전 각과 AT에 따른 EYE를 구한다
     float xz_dis;
     xz_dis = fabs(40 * glm::cos(glm::radians(angle.y)));
 

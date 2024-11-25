@@ -39,6 +39,7 @@ struct UpdateInfo {         // The packet which client sends to server
     glm::vec3 cameraEYE;
     glm::vec2 cameraangle;
     int ammo;
+
 };
 #pragma pack()
 

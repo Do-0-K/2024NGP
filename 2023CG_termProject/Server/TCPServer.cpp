@@ -21,7 +21,10 @@ TCPServer::TCPServer() {
 	InitializeCriticalSection(&consoleCS);
 	// Create and initialize enemies
 	for (int i = 0; i < 14; ++i) {
-		enemyList.push_back(new NM_zombie(1200, 1350, 20, 30, 27, 일반));
+		NM_zombie* zombie = new NM_zombie(1200, 1350, 20, 30, 27, 일반);
+		zombie->setPlayer(player); // Player 객체 전달
+		enemyList.push_back(zombie);
+
 	}
 }
 TCPServer::~TCPServer() {
@@ -84,7 +87,6 @@ void TCPServer::BindAndListen() {
 	}
 
 }
-
 void TCPServer::Execute() {
 	BindAndListen();
 	std::cout << "Waiting for clients to connect..." << std::endl;
@@ -100,17 +102,9 @@ void TCPServer::Execute() {
 		for (int i = 0; i < clientCount; ++i) {
 			SetEvent(m_hUpdateEvent[i]);
 		}
-		// 매뉴얼 아니라 Wait 끝나면 알아서 Reset 됩니다.
-		// Reset all events 
-		//for (HANDLE event : client_events) {
-		//	ResetEvent(event);
-		//}
+
 	}
 }
-
-
-
-// 이렇게 하면 소켓 살아있나요?
 void TCPServer::AcceptClients() {
 	sockaddr_in clientaddr;
 	int addrlen = sizeof(clientaddr);
@@ -149,10 +143,6 @@ void TCPServer::AcceptClients() {
 }
 
 
-
-
-
-
 void TCPServer::Update() {
 	EnterCriticalSection(&consoleCS);
 	SetCursorPosition(0, 2);
@@ -162,10 +152,12 @@ void TCPServer::Update() {
 	// Update enemy positions
 	for (auto& enemy : enemyList) {
 		if (!enemy->Death_check()) {	// 안죽었으면 이동
-			//			enemy->walk_ani(1); // Update enemy movement
+			enemy->walk_ani(1); // Update enemy movement
+
 		}
 		else {							// 죽었으면 체력 채우고 위치 변경
-
+			enemy->Update_HP(1200); // 체력 회복 예제
+			enemy->setLoc(glm::vec3(rand() % 100, 0, rand() % 100)); // 임의의 위치로 이동
 		}
 	}
 
@@ -225,6 +217,12 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
 		if (server->updateInfo[clientIndex].flag == 1) {
 			// 여기서 이벤트 사용 하나 더 할 예정
 			// 여기에 좀비 체력 업데이트 함수 사용
+			for (auto& zombie : server->enemyList) {
+				PlayerInfo temp;
+				temp.cameraEYE = server->playerinfo[clientIndex].cameraEYE;			//updateinfo의 playerinfo값으로 바꾸기
+				temp.Angle = server->playerinfo[clientIndex].Angle;
+				server->player->attack_check(server->enemyList, &temp);
+			}
 			continue;
 		}
 
@@ -245,7 +243,7 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
 		//	
 		//}
 		SetEvent(server->client_events[clientIndex]);
-		
+
 		WaitForSingleObject(server->m_hUpdateEvent[clientIndex], INFINITE);
 
 		// 적 리스트 관리 및 새 적 생성

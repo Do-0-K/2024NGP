@@ -169,6 +169,11 @@ NM_zombie::~NM_zombie()
 	}
 }
 
+void NM_zombie::setPlayer(Player* player)
+{
+	mPlayer = player;
+}
+
 
 void NM_zombie::walk_ani(int n)
 {

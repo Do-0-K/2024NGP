@@ -7,13 +7,16 @@
 
 #include "Enemy.h"
 #include "NMMesh.h"
+#include "Player.h"
+
+class Player;
 
 class NM_zombie : public EnemyBase {
 public:
 	NM_zombie();
 	NM_zombie(float hp, float max, float spd, float def, float atk, int type);
 	~NM_zombie();
-
+	void setPlayer(Player* player);
 	void walk_ani(int n);
 	void setHit(bool);
 	void UpdateMatrix();
