@@ -7,6 +7,7 @@
 CRITICAL_SECTION consoleCS; // CriticalSection for console output
 UpdateInfo TCPServer::updateInfo[2];          // 클라이언트 업데이트 정보 정의
 RenderInfo TCPServer::renderInfo[2];          // 클라이언트 렌더링 정보 정의
+PlayerInfo TCPServer::playerinfo[2] ;          // 클라이언트 렌더링 정보 정의
 
 void SetCursorPosition(int x, int y) {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -155,14 +156,14 @@ void TCPServer::Update() {
 	// Update enemy positions
 	for (auto& enemy : enemyList) {
 		if (!enemy->Death_check()) {
-			enemy->walk_ani(1); // Update enemy movement
+//			enemy->walk_ani(1); // Update enemy movement
 		}
 	}
 
 	// Exchange player info between clients
 	if (clientCount == 2) {
-		renderInfo[0].opposite = { updateInfo[1].cameraEYE, updateInfo[1].cameraangle };
-		renderInfo[1].opposite = { updateInfo[0].cameraEYE, updateInfo[0].cameraangle };
+		renderInfo[0].opposite = { playerinfo[1].cameraEYE, playerinfo[1].Angle };
+		renderInfo[1].opposite = { playerinfo[0].cameraEYE, playerinfo[0].Angle };
 	}
 	//=========================================================start Dong-ki-wow~
 	
@@ -173,10 +174,10 @@ void TCPServer::Update() {
 	for (int i = 0; i < clientCount; ++i) {
 		SetCursorPosition(0, 6 + i * 4);
 		std::cout << "Client[" << i + 1 << "] Info: " << std::endl;
-		std::cout << "Position: (" << updateInfo[i].cameraEYE.x << ", "
-			<< updateInfo[i].cameraEYE.y << ", " << updateInfo[i].cameraEYE.z << ")" << std::endl;
-		std::cout << "Angle: (" << updateInfo[i].cameraangle.x << ", "
-			<< updateInfo[i].cameraangle.y << ")" << std::endl;
+		std::cout << "Position: (" << playerinfo[i].cameraEYE.x << ", "
+			<< playerinfo[i].cameraEYE.y << ", " << playerinfo[i].cameraEYE.z << ")" << std::endl;
+		std::cout << "Angle: (" << playerinfo[i].Angle.x << ", "
+			<< playerinfo[i].Angle.y << ")" << std::endl;
 	}
 	LeaveCriticalSection(&consoleCS);
 }
@@ -195,13 +196,13 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
 	
 
 	int recvSize;
-	PlayerInfo playerinfo;		//임시로 만든거 이제 지울거임
+	
 
 	// Main thread loop
 	while (true) {
 		// Receive PlayerInfo structure from client
 		//recvSize = recv(clientSocket, (char*)&server->updateInfo[clientIndex], sizeof(server->updateInfo[clientIndex]), MSG_WAITALL);
-		recvSize = recv(clientSocket, (char*)&playerinfo, sizeof(playerinfo), MSG_WAITALL);		//임시로 만든거 이제 지울거임
+		recvSize = recv(clientSocket, (char*)&server->playerinfo[clientIndex], sizeof(server->playerinfo[clientIndex]), MSG_WAITALL);		//임시로 만든거 이제 지울거임
 		if (recvSize <= 0) {
 			EnterCriticalSection(&server->consoleCS);
 			SetCursorPosition(0, 5);
@@ -218,8 +219,8 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
 			// Check collisions between player's attack and zombies
 			for (auto& zombie : server->enemyList) {
 				PlayerInfo temp;
-				temp.cameraEYE = playerinfo.cameraEYE;			//updateinfo의 playerinfo값으로 바꾸기
-				temp.Angle = playerinfo.Angle;
+				temp.cameraEYE = server->playerinfo[clientIndex].cameraEYE;			//updateinfo의 playerinfo값으로 바꾸기
+				temp.Angle = server->playerinfo[clientIndex].Angle;
 
 				// 적 리스트와 플레이어 정보로 공격 체크
 				server->player->attack_check(server->enemyList, &temp);
@@ -258,9 +259,10 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
 
 	//// Prepare renderInfo to send back to the client
 	server->FillRenderInfo(server->renderInfo[clientIndex], server->enemyList, server->player);
-
+	// Signal event to allow main loop to process update
+	SetEvent(server->client_events[clientIndex]);
 	// Send renderInfo back to the client
-	send(clientSocket, (char*)&renderInfo, sizeof(renderInfo), 0);
+	send(clientSocket, (char*)&server->renderInfo[clientIndex], sizeof(server->renderInfo[clientIndex]), 0);
 	}
 
 	// Cleanup

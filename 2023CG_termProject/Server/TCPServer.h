@@ -74,4 +74,5 @@ private:
     Player* player;                     // Player instance
     static UpdateInfo updateInfo[2];           // Update information for 2 clients
     static RenderInfo renderInfo[2];           // Render information for 2 clients
+    static PlayerInfo playerinfo[2];           // 임시로 만든거
 };

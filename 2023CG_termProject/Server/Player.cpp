@@ -199,7 +199,7 @@ void Player::attack_check(std::vector<EnemyBase*>& temp_list, PlayerInfo* player
 
             if (is_contact) {
                 zombie->setHit(true); // 좀비가 맞았음을 설정
-                cout << "맞았습니다" << endl;
+              //  cout << "맞았습니다" << endl;
                 is_contact = false;
                 break; // 부위별 충돌 검사 중 하나만 충돌해도 나머지는 검사하지 않음
             }
@@ -218,7 +218,7 @@ void Player::attack_check(std::vector<EnemyBase*>& temp_list, PlayerInfo* player
 
     if (closestZombieIndex != -1) {
         aliveEnemy[closestZombieIndex]->Update_HP(-ATK); // 공격력만큼 체력 감소
-        std::cout << "Zombie hit! Remaining HP: " << aliveEnemy[closestZombieIndex]->getHP() << std::endl;
+      //  std::cout << "Zombie hit! Remaining HP: " << aliveEnemy[closestZombieIndex]->getHP() << std::endl;
         
         if (aliveEnemy[closestZombieIndex]->Death_check()) {
             std::cout << "Zombie killed!" << std::endl;
