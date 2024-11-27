@@ -74,7 +74,8 @@ private:
     CRITICAL_SECTION consoleCS; // Critical section for console output
    int max_enemycount = 14;
     std::vector<EnemyBase*> enemyList;  // Enemy list
-    Player* player;                     // Player instance
+    std::vector<Player*> players;  // Enemy list
+   
     static UpdateInfo updateInfo[2];           // Update information for 2 clients
     static RenderInfo renderInfo[2];           // Render information for 2 clients
     static PlayerInfo playerinfo[2];           // 임시로 만든거

@@ -49,6 +49,8 @@ public:
 
 	glm::vec3 getLoc();				// 현재 위치 받아오기	EYE
 	glm::vec2 getRot();				// 현재 바라보는 방향 받아오기	AT
+	void setLoc(glm::vec3& Pos);				// 위치 설정하기	EYE
+	void setRot(glm::vec2& At);				//  방향 설정하기	AT
 	glm::vec2 getWepRot();			// 현재 바라보는 방향에 맞춰 총기위치 지정하기
 	float getammo();
 	Weapon* getWeapon() const;		// 내가 들고 있는 무기 정보 받기

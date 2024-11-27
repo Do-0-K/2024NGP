@@ -60,6 +60,13 @@ glm::vec2 Player::getRot()
 	return cur_rot;
 }
 
+void Player::setLoc(glm::vec3& Pos)
+{
+    cur_loc = Pos;
+}
+
+
+
 glm::vec2 Player::getWepRot()
 {
 	return init_Weapon_rot;

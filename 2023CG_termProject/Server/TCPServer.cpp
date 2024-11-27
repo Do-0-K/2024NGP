@@ -17,19 +17,21 @@ void SetCursorPosition(int x, int y) {
 
 TCPServer::TCPServer() {
 	// Create player
-	player = new Player(100, 200, 40, 20, 0);
+	for (int i = 0; i < 2; ++i) {
+	players.push_back(new Player(100, 200, 40, 20, 0));
+	}
 	InitializeCriticalSection(&consoleCS);
 	// Create and initialize enemies
 	for (int i = 0; i < 14; ++i) {
 		NM_zombie* zombie = new NM_zombie(1200, 1350, 20, 30, 27, 일반);
-		zombie->setPlayer(player); // Player 객체 전달
+		//zombie->setPlayer(players); // Player 객체 전달
 		enemyList.push_back(zombie);
 
 	}
 }
 TCPServer::~TCPServer() {
 	// Delete player
-	delete player;
+	
 	DeleteCriticalSection(&consoleCS);
 
 	// Close all sockets and threads
@@ -59,6 +61,7 @@ void TCPServer::BindAndListen() {
 	serverAddr.sin_family = AF_INET;
 	//serverAddr.sin_addr.s_addr = INADDR_ANY;      // Bind to all available interfaces
 	serverAddr.sin_port = htons(Portnum);
+	//serverAddr.sin_port = htons(9000);
 
 	char hostName[256];
 	gethostname(hostName, sizeof(hostName));
@@ -67,10 +70,13 @@ void TCPServer::BindAndListen() {
 	hostent* ptr = gethostbyname(hostName);
 	memcpy(&serverAddr.sin_addr, ptr->h_addr_list[0], ptr->h_length);
 
+	//const char* ppppp = "121.190.132.246";
+	//inet_pton(AF_INET, ppppp, &serverAddr.sin_addr);
+
 	char iptest[22];
 
 	inet_ntop(AF_INET, &serverAddr.sin_addr, iptest, sizeof(iptest));
-	//printf("서버의 ip주소 - %s\n", iptest);
+	printf("서버의 ip주소 - %s\n", iptest);
 
 	if (bind(listen_sock, (sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
 		std::cout << "Binding failed" << std::endl;
@@ -151,21 +157,25 @@ void TCPServer::Update() {
 
 	// Update enemy positions
 	for (auto& enemy : enemyList) {
-		if (!enemy->Death_check()) {	// 안죽었으면 이동
-			enemy->walk_ani(1); // Update enemy movement
-
+		NM_zombie* zombie = dynamic_cast<NM_zombie*>(enemy);
+		zombie->setPlayer(players);
+		if (!zombie->Death_check()) {  // Check if the zombie is alive
+			zombie->walk_ani();  // Move the zombie toward the player
 		}
-		else {							// 죽었으면 체력 채우고 위치 변경
-			enemy->Update_HP(1200); // 체력 회복 예제
-			enemy->setLoc(glm::vec3(rand() % 100, 0, rand() % 100)); // 임의의 위치로 이동
+		else {
+			// Revive the zombie if it's dead
+			zombie->Update_HP(1200); // Restore health
+			zombie->setLoc(glm::vec3(rand() % 100, 0, rand() % 100)); // Move to a random location
 		}
 	}
+	
 
 	// Exchange player info between clients
 	if (clientCount == 2) {
 		renderInfo[0].opposite = { playerinfo[1].cameraEYE, playerinfo[1].Angle };
 		renderInfo[1].opposite = { playerinfo[0].cameraEYE, playerinfo[0].Angle };
 	}
+
 	//=========================================================start Dong-ki-wow~
 
 
@@ -173,12 +183,13 @@ void TCPServer::Update() {
 	// Print current state to console
 	EnterCriticalSection(&consoleCS);
 	for (int i = 0; i < clientCount; ++i) {
-		SetCursorPosition(0, 6 + i * 4);
+		SetCursorPosition(0, 6 + i * 6);
 		std::cout << "Client[" << i + 1 << "] Info: " << std::endl;
 		std::cout << "Position: (" << playerinfo[i].cameraEYE.x << ", "
 			<< playerinfo[i].cameraEYE.y << ", " << playerinfo[i].cameraEYE.z << ")" << std::endl;
 		std::cout << "Angle: (" << playerinfo[i].Angle.x << ", "
 			<< playerinfo[i].Angle.y << ")" << std::endl;
+		std::cout << "첫번쨰 좀비의 좌표 x:" << enemyList[0]->getLoc().x <<" y:" << enemyList[0]->getLoc().y << " z:" << enemyList[0]->getLoc().z << endl;
 	}
 	LeaveCriticalSection(&consoleCS);
 }
@@ -213,6 +224,7 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
 			break;
 		}
 
+		server->players[clientIndex]->setLoc(server->playerinfo[clientIndex].cameraEYE);
 		// 1이 공격 0이 이동
 		if (server->updateInfo[clientIndex].flag == 1) {
 			// 여기서 이벤트 사용 하나 더 할 예정
@@ -221,7 +233,7 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
 				PlayerInfo temp;
 				temp.cameraEYE = server->playerinfo[clientIndex].cameraEYE;			//updateinfo의 playerinfo값으로 바꾸기
 				temp.Angle = server->playerinfo[clientIndex].Angle;
-				server->player->attack_check(server->enemyList, &temp);
+				server->players[clientIndex]->attack_check(server->enemyList, &temp);
 			}
 			continue;
 		}
@@ -271,7 +283,7 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
 		//renderInfo[clientIndex].alive_num = aliveCount;
 
 	//// Prepare renderInfo to send back to the client
-		server->FillRenderInfo(server->renderInfo[clientIndex], server->enemyList, server->player);
+		server->FillRenderInfo(server->renderInfo[clientIndex], server->enemyList, server->players[clientIndex]);
 
 		// Send renderInfo back to the client
 		send(clientSocket, (char*)&server->renderInfo[clientIndex], sizeof(server->renderInfo[clientIndex]), 0);

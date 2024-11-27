@@ -3,7 +3,7 @@
 #include <ctime>
 #include "CharacterBase.h"
 //#include "Player.h"
-
+class Player;
 
 class EnemyBase : public CharacterBase {
 public:
@@ -18,6 +18,7 @@ public:
 	}
 
 	virtual void walk_ani(int n) {};
+	virtual void walk_ani(int n, std::vector<Player*>& players) {}
 	virtual void attack();
 	
 	virtual void setLoc(glm::vec3 loc);
