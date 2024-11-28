@@ -224,53 +224,28 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
 			break;
 		}
 
-		server->players[clientIndex]->setLoc(server->playerinfo[clientIndex].cameraEYE);
+		server->players[clientIndex]->setLoc(server->playerinfo[clientIndex].cameraEYE);		//임시 코드 updateinfo로 하면 지울거
+		server->players[clientIndex]->setAtk(server->updateInfo[clientIndex].weaponType);
+
 		// 1이 공격 0이 이동
-		if (server->updateInfo[clientIndex].flag == 1) {
+		if (server->updateInfo[clientIndex].flag == 0) {
 			// 여기서 이벤트 사용 하나 더 할 예정
+			// std::cout << "Player " << clientIndex << " is attacking!" << std::endl;
 			// 여기에 좀비 체력 업데이트 함수 사용
 			for (auto& zombie : server->enemyList) {
 				PlayerInfo temp;
 				temp.cameraEYE = server->playerinfo[clientIndex].cameraEYE;			//updateinfo의 playerinfo값으로 바꾸기
 				temp.Angle = server->playerinfo[clientIndex].Angle;
-				server->players[clientIndex]->attack_check(server->enemyList, &temp);
+				server->players[clientIndex]->attack_check(server->enemyList, &temp, server->updateInfo[clientIndex].weaponType);
 			}
-			continue;
+			//continue;
 		}
 
-		// Check if player is attacking (flag == 1)
-		//if (server->updateInfo[clientIndex].flag == 0)		//총 쏘는경우 임시 
-		//{
-		//	//std::cout << "Player " << clientIndex << " is attacking!" << std::endl;
-
-		//	// Check collisions between player's attack and zombies
-		//	for (auto& zombie : server->enemyList) {
-		//		PlayerInfo temp;
-		//		temp.cameraEYE = server->playerinfo[clientIndex].cameraEYE;			//updateinfo의 playerinfo값으로 바꾸기
-		//		temp.Angle = server->playerinfo[clientIndex].Angle;
-
-		//		// 적 리스트와 플레이어 정보로 공격 체크
-		//		server->player->attack_check(server->enemyList, &temp);
-		//	}
-		//	
-		//}
 		SetEvent(server->client_events[clientIndex]);
 
 		WaitForSingleObject(server->m_hUpdateEvent[clientIndex], INFINITE);
 
-		// 적 리스트 관리 및 새 적 생성
-		//for (int i = 0; i < server->enemyList.size(); ++i) {
-		//	if (server->enemyList[i]->Death_check()) {
-		//		
-		//		server->enemyList.erase(server->enemyList.begin() + i);
-		//		--i;
-
-		//		if (server->enemyList.size() < 14 && server->max_enemycount < MAX_ENEMY_COUNT) {
-		//			server->enemyList.push_back(new NM_zombie(1200, 1350, 20, 30, 27, 일반));
-		//			server->max_enemycount++;
-		//		}
-		//	}
-		//}
+	
 
 
 		//// 현재 살아 있는 적의 수 계산 및 반영

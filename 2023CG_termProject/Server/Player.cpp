@@ -67,6 +67,26 @@ void Player::setLoc(glm::vec3& Pos)
 
 
 
+void Player::setAtk(int attack)
+{
+    ATK = attack;
+    switch (attack)
+    {
+        
+    case 나이프:
+        ATK = 260;
+        break;
+    case 권총:
+        ATK = 250;
+        break;
+    case 라이플:
+        ATK = 270;
+        break;
+    default:
+        break;
+    }
+}
+
 glm::vec2 Player::getWepRot()
 {
 	return init_Weapon_rot;
@@ -104,13 +124,13 @@ glm::vec3 CalculateAt(const glm::vec3& eye, const glm::vec2& angle) {
 	return atPoint;
 }
 
-void Player::attack_check(std::vector<EnemyBase*>& temp_list, PlayerInfo* playerinfo) {
+void Player::attack_check(std::vector<EnemyBase*>& temp_list, PlayerInfo* playerinfo, int& weaponType) {
     glm::vec3 ray_first = glm::vec3(playerinfo->cameraEYE);
     glm::vec3 ray_last = glm::vec3(CalculateAt(playerinfo->cameraEYE, playerinfo->Angle));
     glm::vec3 ray = ray_last - ray_first;
 
     float mindist = 200.0f;
-    switch (weapon) { // 무기에 따른 사거리 설정
+    switch (weaponType) { // 무기에 따른 사거리 설정
     case 나이프:
         mindist = 200.0f;
         break;
