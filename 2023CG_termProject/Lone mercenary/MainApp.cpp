@@ -176,14 +176,18 @@ void MainApp::MainAppConnect()
 
 	// 호스트의 IP 주소를 알아내기
 	//const char* hostName = "DESKTOP-SNG2JRJ";// 서버로 사용할 호스트 이름
-	const char* hostName = "농담이";
+	/*const char* hostName = "DESKTOP-I9R4AO6";
 	hostent* ptr = gethostbyname(hostName);
 	if (ptr == nullptr) {
 		std::cout << "can't find Hostname" << std::endl;
 		exit(1);
 	}
 
-	memcpy(&serveraddr.sin_addr, ptr->h_addr_list[0], ptr->h_length);
+	memcpy(&serveraddr.sin_addr, ptr->h_addr_list[0], ptr->h_length);*/
+
+	const char* pppp = "10.20.11.28";
+
+	inet_pton(AF_INET, pppp, &serveraddr.sin_addr);
 
 	char test[22];
 	inet_ntop(AF_INET, &serveraddr.sin_addr, test, sizeof(test));
