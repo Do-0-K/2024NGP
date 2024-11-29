@@ -34,6 +34,30 @@ void EnemyBase::setLoc(glm::vec3 loc)
 	cur_loc = loc;
 }
 
+void EnemyBase::randLoc()
+{
+	std::random_device rd;
+	std::default_random_engine dre(rd());
+	std::uniform_int_distribution<int> uid(1, 4);
+
+	std::uniform_int_distribution<int> z_rnd(-30, 30);
+	
+	switch (uid(dre)) {
+	case 1:
+		cur_loc = glm::vec3(100, 0, z_rnd(dre));
+		break;
+	case 2:
+		cur_loc = glm::vec3(z_rnd(dre), 0, 100);
+		break;
+	case 3:
+		cur_loc = glm::vec3(-100, 0, z_rnd(dre));
+		break;
+	case 4:
+		cur_loc = glm::vec3(z_rnd(dre), 0, -100);
+		break;
+	}
+}
+
 void EnemyBase::setRot(glm::vec2 rot)
 {
 	cur_rot = rot;

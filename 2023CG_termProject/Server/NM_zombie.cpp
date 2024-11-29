@@ -68,7 +68,7 @@ NM_zombie::NM_zombie(float hp, float max, float spd, float def, float atk, int t
 		cur_loc = glm::vec3(z_rnd(dre), 0, -100);
 		break;
 	}
-	cur_loc = glm::vec3(0, 0, 0);
+	//cur_loc = glm::vec3(0, 0, 0);
 	cur_rot = glm::vec3(0.0f);
 
 	switch (z_type) {

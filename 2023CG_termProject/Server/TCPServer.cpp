@@ -165,7 +165,7 @@ void TCPServer::Update() {
 		else {
 			// Revive the zombie if it's dead
 			zombie->Update_HP(1200); // Restore health
-			zombie->setLoc(glm::vec3(rand() % 100, 0, rand() % 100)); // Move to a random location
+			zombie->randLoc(); // Move to a random location
 		}
 	}
 	
