@@ -11,6 +11,7 @@
 #include "ItemBox.h"
 #include "Timeplus.h"
 
+DWORD WINAPI NetworkingThread(LPVOID args);
 
 class Field : public Scene {
 public:
@@ -23,15 +24,29 @@ public:
 
 	// 사람들 
 
+	//static DWORD WINAPI NetworkingThread(LPVOID args);
+
 	static int first_zom;
 
 	bool check_zomcol(EnemyBase* [], int);
+
+	void UpdateFromPacket(void* pData);
 
 	void ProcessInput();
 	void togleMinimap();
 
 	void Update();
 	void Render();
+
+	GameTimer* getTimer()
+	{
+		return mTimer;
+	}
+
+	std::shared_ptr<SOCKET> m_pSock;	// 클라이언트 소켓
+	HANDLE threadHandle;
+	HANDLE hReadEvnet;
+	HANDLE hWriteEvent;
 private:
 	CharacterBase* mPlayer{ nullptr };
 	FieldMap* mField;
@@ -46,8 +61,6 @@ private:
 
 	int max_alive{};		// 한 필드에 최대 존재 좀비 수
 	int aliving{};		// 한 필드에 존재하는 좀비 수
-
-	std::shared_ptr<SOCKET> m_pSock;	// 클라이언트 소켓
 
 
 	bool m_bShowMinimap = false;

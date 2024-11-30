@@ -34,6 +34,11 @@ float CharacterBase::getHP()
 	return HP;
 }
 
+void CharacterBase::setHP(int hp)
+{
+	HP = hp;
+}
+
 float CharacterBase::getNorHPPercent()
 {
 	if (HP < 0)

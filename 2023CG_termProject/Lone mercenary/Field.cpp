@@ -3,29 +3,47 @@
 #include "NM_zombie.h"
 #include "ShaderProgram.h"
 
-#pragma pack(1)
-struct PlayerInfo {
-	glm::vec3 cameraEYE;
-	glm::vec2 Angle;
-};
-
-struct ObjectInfo {
-	int HP;
-	glm::vec3 Pos;
-	glm::vec2 Rot;
-};
-
-struct RenderInfo {
-	int HP;
-	int ammo;
-	PlayerInfo opposite;
-	ObjectInfo alive_enemy[14];
-	ObjectInfo box;
-	int remainTime;
-};
-#pragma pack()
+//#pragma pack(1)
+//struct PlayerInfo {
+//	glm::vec3 cameraEYE;
+//	glm::vec2 Angle;
+//};
+//
+//struct ObjectInfo {
+//	int HP;
+//	glm::vec3 Pos;
+//	glm::vec2 Rot;
+//};
+//
+//struct RenderInfo {
+//	int HP;
+//	int ammo;
+//	PlayerInfo opposite;
+//	ObjectInfo alive_enemy[14];
+//	ObjectInfo box;
+//	int remainTime;
+//};
+//
+//#pragma pack()
 
 int Field::first_zom = 0;
+
+DWORD WINAPI NetworkingThread(LPVOID args)
+{
+	Field* pField = (Field*)args;
+	int retval;
+	while (1) {
+		RenderInfo renderInfo;
+		retval = recv(*(pField->m_pSock), (char*)&renderInfo, sizeof(RenderInfo), MSG_WAITALL);
+		ResetEvent(pField->hWriteEvent);
+		
+		pField->UpdateFromPacket(&renderInfo);
+
+		SetEvent(pField->hWriteEvent);
+		if (pField->getTimer()->getremaining() == 0)
+			break;
+	}
+}
 
 Field::Field(CharacterBase* t_player, FieldMap* t_field, CameraObj* t_camera, ProjObj* proj, std::vector<EnemyBase*>& t_list, GameTimer* t_timer, CubeMap* t_cube, std::shared_ptr<SOCKET>& pSock)
 	: mPlayer(t_player), mField(t_field), mCamera(t_camera), m_pProj(proj), enemy_list(t_list), mTimer(t_timer), mCubemap(t_cube)
@@ -39,6 +57,12 @@ Field::Field(CharacterBase* t_player, FieldMap* t_field, CameraObj* t_camera, Pr
 	m_pOpposite = std::make_unique<NM_zombie>(100, 100, 100, 100, 100, 사람);
 	m_pShader = ShaderProgram::getShader();
 	mLoc = glGetUniformLocation(m_pShader->s_program, "HPPercent");
+
+	hReadEvnet = CreateEvent(NULL, FALSE, TRUE, NULL);
+	hWriteEvent = CreateEvent(NULL, TRUE, TRUE, NULL);
+
+	threadHandle = CreateThread(NULL, 0, NetworkingThread, this, 0, NULL);
+	CloseHandle(threadHandle);
 }
 
 Field::~Field()
@@ -47,6 +71,8 @@ Field::~Field()
 	mPlayer = nullptr;
 	mField = nullptr;
 	delete item;
+	CloseHandle(hReadEvnet);
+	CloseHandle(hWriteEvent);
 }
 
 void Field::Update()
@@ -79,7 +105,7 @@ void Field::Update()
 	dynamic_cast<Player*>(mPlayer)->reload_ani();
 	dynamic_cast<Player*>(mPlayer)->knife_AT_ani();
 
-
+	// ==============이 부분을 스레드로 옮기자===================
 	RenderInfo renderInfo;
 	retval = recv(*m_pSock, (char*)&renderInfo, sizeof(RenderInfo), MSG_WAITALL);
 	if (retval == 0) {
@@ -96,6 +122,7 @@ void Field::Update()
 
 	m_pOpposite->UpdateMatrix();
 
+	// ==========================================================
 
 	/*m_pOpposite->setLoc(tempOppEYE);
 	m_pOpposite->setRot(tempOppAngle);
@@ -117,7 +144,7 @@ void Field::Update()
 				break;
 		}
 	}*/
-	float y{};
+	/*float y{};
 	static float rot{};
 	for (EnemyBase*& enemy : enemy_list) {
 		enemy->setLoc(glm::vec3(0.0, y, 0.0));
@@ -125,7 +152,7 @@ void Field::Update()
 		dynamic_cast<NM_zombie*>(enemy)->UpdateMatrix();
 		y += 10.0;
 		rot += 2.0f;
-	}
+	}*/
 
 
 	// 좀비의 움직임, 지금은 비활성
@@ -152,6 +179,22 @@ void Field::Update()
 	item->rot_ani();
 	//====================================================
 	mUi->Update(m_nTime);
+}
+
+void Field::UpdateFromPacket(void* pData)
+{
+	RenderInfo* pInfo = (RenderInfo*)pData;
+
+	mPlayer->setHP(pInfo->HP);
+	// update zombie
+	for (int i = 0; i < 14; ++i) {
+		enemy_list[i]->setHP(pInfo->alive_enemy[i].HP);
+		enemy_list[i]->setLoc(pInfo->alive_enemy[i].Pos);
+		enemy_list[i]->setRot(pInfo->alive_enemy[i].Rot);
+	}
+
+	item->setLoc(pInfo->box.Pos);
+
 }
 
 // 상대 위치 테스트용 키 입력 함수
@@ -187,6 +230,8 @@ void Field::togleMinimap()
 
 void Field::Render()
 {
+	WaitForSingleObject(hWriteEvent, INFINITE);
+	ResetEvent(hReadEvnet);
 	ProcessInput();
 	glViewport(0, 0, 1280, 720);
 	//m_pProj->setOrtho(false);
@@ -255,6 +300,7 @@ void Field::Render()
 		m_pProj->setOrtho(false);
 		m_pProj->OutToShader();
 	}
+	SetEvent(hReadEvnet);
 }
 
 CharacterBase* Field::getPlayer()

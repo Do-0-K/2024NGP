@@ -14,6 +14,8 @@ public:
 	void Update_HP(float);				// 체력 수정 상대 ATK를 받아와서 사용
 	virtual bool Death_check();					// 체력이 0이하면 true 반환
 
+	virtual void setHP(int hp);
+
 	float getHP();
 	float getNorHPPercent();
 protected:
