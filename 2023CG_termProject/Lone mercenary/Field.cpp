@@ -180,6 +180,14 @@ void Field::Update()
 	mUi->Update(m_nTime);
 }
 
+void Field::UpdateFromPacket(void* pData)
+{
+	RenderInfo* pInfo = (RenderInfo*)pData;
+	for (int i = 0; i < 14; ++i) {
+		enemy_list[i]->setLoc(pInfo->)
+	}
+}
+
 // 상대 위치 테스트용 키 입력 함수
 void Field::ProcessInput()
 {

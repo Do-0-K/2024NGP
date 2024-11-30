@@ -30,6 +30,8 @@ public:
 
 	bool check_zomcol(EnemyBase* [], int);
 
+	void UpdateFromPacket(void* pData);
+
 	void ProcessInput();
 	void togleMinimap();
 
