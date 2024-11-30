@@ -3,27 +3,28 @@
 #include "NM_zombie.h"
 #include "ShaderProgram.h"
 
-#pragma pack(1)
-struct PlayerInfo {
-	glm::vec3 cameraEYE;
-	glm::vec2 Angle;
-};
-
-struct ObjectInfo {
-	int HP;
-	glm::vec3 Pos;
-	glm::vec2 Rot;
-};
-
-struct RenderInfo {
-	int HP;
-	int ammo;
-	PlayerInfo opposite;
-	ObjectInfo alive_enemy[14];
-	ObjectInfo box;
-	int remainTime;
-};
-#pragma pack()
+//#pragma pack(1)
+//struct PlayerInfo {
+//	glm::vec3 cameraEYE;
+//	glm::vec2 Angle;
+//};
+//
+//struct ObjectInfo {
+//	int HP;
+//	glm::vec3 Pos;
+//	glm::vec2 Rot;
+//};
+//
+//struct RenderInfo {
+//	int HP;
+//	int ammo;
+//	PlayerInfo opposite;
+//	ObjectInfo alive_enemy[14];
+//	ObjectInfo box;
+//	int remainTime;
+//};
+//
+//#pragma pack()
 
 int Field::first_zom = 0;
 
@@ -36,7 +37,7 @@ DWORD WINAPI NetworkingThread(LPVOID args)
 		retval = recv(*(pField->m_pSock), (char*)&renderInfo, sizeof(RenderInfo), MSG_WAITALL);
 		ResetEvent(pField->hWriteEvent);
 		
-
+		pField->UpdateFromPacket(&renderInfo);
 
 		SetEvent(pField->hWriteEvent);
 		if (pField->getTimer()->getremaining() == 0)
@@ -143,7 +144,7 @@ void Field::Update()
 				break;
 		}
 	}*/
-	float y{};
+	/*float y{};
 	static float rot{};
 	for (EnemyBase*& enemy : enemy_list) {
 		enemy->setLoc(glm::vec3(0.0, y, 0.0));
@@ -151,7 +152,7 @@ void Field::Update()
 		dynamic_cast<NM_zombie*>(enemy)->UpdateMatrix();
 		y += 10.0;
 		rot += 2.0f;
-	}
+	}*/
 
 
 	// 좀비의 움직임, 지금은 비활성
@@ -183,9 +184,17 @@ void Field::Update()
 void Field::UpdateFromPacket(void* pData)
 {
 	RenderInfo* pInfo = (RenderInfo*)pData;
+
+	mPlayer->setHP(pInfo->HP);
+	// update zombie
 	for (int i = 0; i < 14; ++i) {
-		enemy_list[i]->setLoc(pInfo->)
+		enemy_list[i]->setHP(pInfo->alive_enemy[i].HP);
+		enemy_list[i]->setLoc(pInfo->alive_enemy[i].Pos);
+		enemy_list[i]->setRot(pInfo->alive_enemy[i].Rot);
 	}
+
+	item->setLoc(pInfo->box.Pos);
+
 }
 
 // 상대 위치 테스트용 키 입력 함수

@@ -34,3 +34,8 @@ void EnemyBase::setRot(glm::vec2 rot)
 	cur_rot = rot;
 	
 }
+
+void EnemyBase::setHP(int hp)
+{
+	HP = hp;
+}
