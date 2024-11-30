@@ -175,8 +175,8 @@ void MainApp::MainAppConnect()
 	serveraddr.sin_family = AF_INET;
 
 	// 호스트의 IP 주소를 알아내기
-	const char* hostName = "DESKTOP-SNG2JRJ";// 서버로 사용할 호스트 이름
-	/*const char* hostName = "농담이";*/
+	//const char* hostName = "DESKTOP-SNG2JRJ";// 서버로 사용할 호스트 이름
+	const char* hostName = "joke";
 	hostent* ptr = gethostbyname(hostName);
 	if (ptr == nullptr) {
 		std::cout << "can't find Hostname" << std::endl;
@@ -223,10 +223,9 @@ bool MainApp::e_arrayReady()
 		enemy_array.clear();
 		std::cout << "Current List size: " << enemy_array.size() << std::endl;
 	}
-	// 이건 잘 알아챘네
 	enemy_array.reserve(14);
 	for (int i = 0; i < 14; ++i) {
-		enemy_array.push_back(new NM_zombie(1200, 1350, 20, 30, 27, 일반));
+		enemy_array.push_back(new NM_zombie(1200, 1200, 20, 30, 27, 일반));
 	}
 	return true;
 }

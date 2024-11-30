@@ -43,6 +43,7 @@ DWORD WINAPI NetworkingThread(LPVOID args)
 		if (pField->getTimer()->getremaining() == 0)
 			break;
 	}
+	return 0;
 }
 
 Field::Field(CharacterBase* t_player, FieldMap* t_field, CameraObj* t_camera, ProjObj* proj, std::vector<EnemyBase*>& t_list, GameTimer* t_timer, CubeMap* t_cube, std::shared_ptr<SOCKET>& pSock)
@@ -88,10 +89,21 @@ void Field::Update()
 	// 여기서 서버에게 위치랑 필요한거 넘기기
 
 
-	PlayerInfo playerInfo{ mCamera->getEYE(), mCamera->getAngle() };
+	//PlayerInfo playerInfo{ mCamera->getEYE(), mCamera->getAngle() };
 	/* 내 위치 보내기*/
 
-	int retval = send(*m_pSock, (char*)&playerInfo, sizeof(playerInfo), 0);
+	UpdateInfo updateInfo;
+	updateInfo.flag = 0;
+	updateInfo.cameraEYE = mCamera->getEYE();
+	updateInfo.cameraangle = mCamera->getAngle();
+	updateInfo.useItem[0] = false;
+	updateInfo.useItem[1] = false;
+	updateInfo.useItem[2] = false;
+	updateInfo.useItem[3] = false;
+	updateInfo.ammo = 0;
+	updateInfo.weaponType = 0;
+
+	int retval = send(*m_pSock, (char*)&updateInfo, sizeof(UpdateInfo), 0);
 
 	if (retval == 0) {
 		std::cout << "전송 실패" << std::endl;
@@ -106,21 +118,21 @@ void Field::Update()
 	dynamic_cast<Player*>(mPlayer)->knife_AT_ani();
 
 	// ==============이 부분을 스레드로 옮기자===================
-	RenderInfo renderInfo;
-	retval = recv(*m_pSock, (char*)&renderInfo, sizeof(RenderInfo), MSG_WAITALL);
-	if (retval == 0) {
-		std::cout << "받은 정보가 없음" << std::endl;
-		exit(1);
-	}
-	// 옳바른 각으로 회전하는지 확인 필요
-	glm::vec3 oppEYE = renderInfo.opposite.cameraEYE;
-	glm::vec2 oppAngle = renderInfo.opposite.Angle;
-	oppEYE.y = 0; oppAngle.y = 0;
+	//RenderInfo renderInfo;
+	//retval = recv(*m_pSock, (char*)&renderInfo, sizeof(RenderInfo), MSG_WAITALL);
+	//if (retval == 0) {
+	//	std::cout << "받은 정보가 없음" << std::endl;
+	//	exit(1);
+	//}
+	//// 옳바른 각으로 회전하는지 확인 필요
+	//glm::vec3 oppEYE = renderInfo.opposite.cameraEYE;
+	//glm::vec2 oppAngle = renderInfo.opposite.Angle;
+	//oppEYE.y = 0; oppAngle.y = 0;
 
-	m_pOpposite->setLoc(oppEYE);
-	m_pOpposite->setRot(oppAngle);
+	//m_pOpposite->setLoc(oppEYE);
+	//m_pOpposite->setRot(oppAngle);
 
-	m_pOpposite->UpdateMatrix();
+	//m_pOpposite->UpdateMatrix();
 
 	// ==========================================================
 
@@ -191,9 +203,19 @@ void Field::UpdateFromPacket(void* pData)
 		enemy_list[i]->setHP(pInfo->alive_enemy[i].HP);
 		enemy_list[i]->setLoc(pInfo->alive_enemy[i].Pos);
 		enemy_list[i]->setRot(pInfo->alive_enemy[i].Rot);
+		enemy_list[i]->UpdateMatrix();
 	}
 
 	item->setLoc(pInfo->box.Pos);
+
+	glm::vec3 oppEYE = pInfo->opposite.cameraEYE;
+	glm::vec2 oppAngle = pInfo->opposite.Angle;
+	oppEYE.y = 0; oppAngle.y = 0;
+
+	m_pOpposite->setLoc(oppEYE);
+	m_pOpposite->setRot(oppAngle);
+
+	m_pOpposite->UpdateMatrix();
 
 }
 

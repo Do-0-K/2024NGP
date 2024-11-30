@@ -34,3 +34,36 @@ using namespace glm;
 
 #define MAX_ALIVE 14
 #define MAX_ZOMBIE 14
+
+
+#pragma pack(1)
+struct PlayerInfo {         // Store player information
+    glm::vec3 cameraEYE;
+    glm::vec2 Angle;
+};
+
+struct ObjectInfo {         // Store object(enemy, box, etc.) information
+    int HP;
+    glm::vec3 Pos;
+    glm::vec2 Rot;
+};
+
+struct RenderInfo {         // The packet which server sends to client
+    int HP;
+    int ammo;
+    PlayerInfo opposite;
+    ObjectInfo alive_enemy[14];
+    ObjectInfo box;
+    int remainTime;
+};
+
+struct UpdateInfo {         // The packet which client sends to server
+    int flag;
+    bool useItem[4];
+    glm::vec3 cameraEYE;
+    glm::vec2 cameraangle;
+    int ammo;
+    int weaponType;
+
+};
+#pragma pack()

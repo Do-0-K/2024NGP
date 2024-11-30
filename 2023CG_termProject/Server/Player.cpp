@@ -124,9 +124,9 @@ glm::vec3 CalculateAt(const glm::vec3& eye, const glm::vec2& angle) {
 	return atPoint;
 }
 
-void Player::attack_check(std::vector<EnemyBase*>& temp_list, PlayerInfo* playerinfo, int& weaponType) {
-    glm::vec3 ray_first = glm::vec3(playerinfo->cameraEYE);
-    glm::vec3 ray_last = glm::vec3(CalculateAt(playerinfo->cameraEYE, playerinfo->Angle));
+void Player::attack_check(std::vector<EnemyBase*>& temp_list, UpdateInfo* updateinfo, int& weaponType) {
+    glm::vec3 ray_first = glm::vec3(updateinfo->cameraEYE);
+    glm::vec3 ray_last = glm::vec3(CalculateAt(updateinfo->cameraEYE, updateinfo->cameraangle));
     glm::vec3 ray = ray_last - ray_first;
 
     float mindist = 200.0f;

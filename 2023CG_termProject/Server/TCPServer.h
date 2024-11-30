@@ -12,37 +12,6 @@
 #define MAX_ENEMY_COUNT 100  // 최대 적 생성 개수
 class TCPServer;
 class Player;
-#pragma pack(1)
-struct PlayerInfo {         // Store player information
-    glm::vec3 cameraEYE;
-    glm::vec2 Angle;
-};
-
-struct ObjectInfo {         // Store object(enemy, box, etc.) information
-    int HP;
-    glm::vec3 Pos;
-    glm::vec2 Rot;
-};
-
-struct RenderInfo {         // The packet which server sends to client
-    int HP;
-    int ammo;
-    PlayerInfo opposite;
-    ObjectInfo alive_enemy[14];
-    ObjectInfo box;
-    int remainTime;
-};
-
-struct UpdateInfo {         // The packet which client sends to server
-    int flag;
-    bool useItem[4];
-    glm::vec3 cameraEYE;
-    glm::vec2 cameraangle;
-    int ammo;
-    int weaponType;
-
-};
-#pragma pack()
 
 struct ThreadArg {
     SOCKET clientSocket;
@@ -70,6 +39,9 @@ private:
     
     // Event for synchronization
     std::vector<HANDLE> m_hUpdateEvent;  // 업데이트 완료 시 신호
+
+    //HANDLE hReadEvent;
+    HANDLE hWriteEvent;
 
     int clientCount = 0;
     CRITICAL_SECTION consoleCS; // Critical section for console output

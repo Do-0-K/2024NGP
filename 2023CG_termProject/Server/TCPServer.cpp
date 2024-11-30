@@ -23,7 +23,7 @@ TCPServer::TCPServer() {
 	InitializeCriticalSection(&consoleCS);
 	// Create and initialize enemies
 	for (int i = 0; i < 14; ++i) {
-		NM_zombie* zombie = new NM_zombie(1200, 1350, 20, 30, 27, 일반);
+		NM_zombie* zombie = new NM_zombie(1200, 1200, 20, 30, 27, 일반);
 		//zombie->setPlayer(players); // Player 객체 전달
 		enemyList.push_back(zombie);
 
@@ -142,6 +142,9 @@ void TCPServer::AcceptClients() {
 		++clientCount;
 	}
 
+	//hReadEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+	hWriteEvent = CreateEvent(NULL, FALSE, TRUE, NULL);
+
 	closesocket(listen_sock);
 	EnterCriticalSection(&consoleCS);
 	SetCursorPosition(0, 4);
@@ -172,8 +175,8 @@ void TCPServer::Update() {
 
 	// Exchange player info between clients
 	if (clientCount == 2) {
-		renderInfo[0].opposite = { playerinfo[1].cameraEYE, playerinfo[1].Angle };
-		renderInfo[1].opposite = { playerinfo[0].cameraEYE, playerinfo[0].Angle };
+		renderInfo[0].opposite = { updateInfo[1].cameraEYE, updateInfo[1].cameraangle };
+		renderInfo[1].opposite = { updateInfo[0].cameraEYE, updateInfo[0].cameraangle };
 	}
 
 	//=========================================================start Dong-ki-wow~
@@ -214,8 +217,8 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
 	while (true) {
 		ResetEvent(server->m_hUpdateEvent[clientIndex]);
 		// Receive PlayerInfo structure from client
-		//recvSize = recv(clientSocket, (char*)&server->updateInfo[clientIndex], sizeof(server->updateInfo[clientIndex]), MSG_WAITALL);
-		recvSize = recv(clientSocket, (char*)&server->playerinfo[clientIndex], sizeof(server->playerinfo[clientIndex]), MSG_WAITALL);		//임시로 만든거 이제 지울거임
+		recvSize = recv(clientSocket, (char*)&server->updateInfo[clientIndex], sizeof(server->updateInfo[clientIndex]), MSG_WAITALL);
+		//recvSize = recv(clientSocket, (char*)&server->playerinfo[clientIndex], sizeof(server->playerinfo[clientIndex]), MSG_WAITALL);		//임시로 만든거 이제 지울거임
 		if (recvSize <= 0) {
 			EnterCriticalSection(&server->consoleCS);
 			SetCursorPosition(0, 5);
@@ -224,21 +227,26 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
 			break;
 		}
 
-		server->players[clientIndex]->setLoc(server->playerinfo[clientIndex].cameraEYE);		//임시 코드 updateinfo로 하면 지울거
-		server->players[clientIndex]->setAtk(server->updateInfo[clientIndex].weaponType);
+		server->players[clientIndex]->setLoc(server->updateInfo[clientIndex].cameraEYE);		//임시 코드 updateinfo로 하면 지울거
 
 		// 1이 공격 0이 이동
-		if (server->updateInfo[clientIndex].flag == 0) {
+		if (server->updateInfo[clientIndex].flag == 1) {
+			int weaponNumber = server->updateInfo[clientIndex].weaponType;
+			server->players[clientIndex]->setAtk(weaponNumber);
 			// 여기서 이벤트 사용 하나 더 할 예정
 			// std::cout << "Player " << clientIndex << " is attacking!" << std::endl;
 			// 여기에 좀비 체력 업데이트 함수 사용
-			for (auto& zombie : server->enemyList) {
-				PlayerInfo temp;
-				temp.cameraEYE = server->playerinfo[clientIndex].cameraEYE;			//updateinfo의 playerinfo값으로 바꾸기
-				temp.Angle = server->playerinfo[clientIndex].Angle;
-				server->players[clientIndex]->attack_check(server->enemyList, &temp, server->updateInfo[clientIndex].weaponType);
-			}
-			//continue;
+
+			// 이게 체력 업데이트?
+			WaitForSingleObject(server->hWriteEvent, INFINITE);
+			SetCursorPosition(0, 20);
+			std::cout << clientIndex << "가 공격" << std::endl;
+			// 이거 뭐임? 공격을 14번 받으려 하네? 장난ㄴㄴ
+			//for (auto& zombie : server->enemyList) {
+				server->players[clientIndex]->attack_check(server->enemyList, &server->updateInfo[clientIndex], weaponNumber);
+			//}
+			SetEvent(server->hWriteEvent);
+			continue;
 		}
 
 		SetEvent(server->client_events[clientIndex]);
