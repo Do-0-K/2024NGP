@@ -259,7 +259,8 @@ void NM_zombie::walk_ani(EnemyBase* t_list[], int myNum) {
 		// Move zombie forward
 		cur_loc += (speed * dir) / 60.0f;
 	}
-
+	if (glm::distance(cur_loc, p_pos) < 3)
+		cur_loc -= (speed * dir) / 60.0f;
 	// Update zombie position and rotation
 	head->setLoc(cur_loc);
 	head->setRot(cur_rot);

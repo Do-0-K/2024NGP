@@ -34,7 +34,7 @@ void EnemyBase::setLoc(glm::vec3 loc)
 	cur_loc = loc;
 }
 
-void EnemyBase::randLoc()
+void EnemyBase::Revive()
 {
 	std::random_device rd;
 	std::default_random_engine dre(rd());
@@ -56,6 +56,7 @@ void EnemyBase::randLoc()
 		cur_loc = glm::vec3(z_rnd(dre), 0, -100);
 		break;
 	}
+	HP = 1200;
 }
 
 void EnemyBase::setRot(glm::vec2 rot)
