@@ -122,7 +122,7 @@ void MainApp::next_state()
 			glutSetCursor(GLUT_CURSOR_RIGHT_ARROW);
 			game_state = 결과창;
 			// 결과창 내보내기 전에 서버에게 개별 점수 받기
-			//retval = recv(*m_pSock, (char*)score, sizeof(int), 0); //take total score from server //패킷으로 받아오기
+			retval = recv(*m_pSock, (char*)score, sizeof(int), 0); //take total score from server
 			dynamic_cast<ScoreBoard*>(score_scene)->SetTotalscore(score); //total score set
 			dynamic_cast<ScoreBoard*>(score_scene)->Update_1(); //finally set mesh
 			delete current_scene;
@@ -176,18 +176,14 @@ void MainApp::MainAppConnect()
 
 	// 호스트의 IP 주소를 알아내기
 	//const char* hostName = "DESKTOP-SNG2JRJ";// 서버로 사용할 호스트 이름
-	/*const char* hostName = "DESKTOP-I9R4AO6";
+	const char* hostName = "joke";
 	hostent* ptr = gethostbyname(hostName);
 	if (ptr == nullptr) {
 		std::cout << "can't find Hostname" << std::endl;
 		exit(1);
 	}
 
-	memcpy(&serveraddr.sin_addr, ptr->h_addr_list[0], ptr->h_length);*/
-
-	const char* pppp = "10.20.11.28";
-
-	inet_pton(AF_INET, pppp, &serveraddr.sin_addr);
+	memcpy(&serveraddr.sin_addr, ptr->h_addr_list[0], ptr->h_length);
 
 	char test[22];
 	inet_ntop(AF_INET, &serveraddr.sin_addr, test, sizeof(test));
@@ -227,10 +223,9 @@ bool MainApp::e_arrayReady()
 		enemy_array.clear();
 		std::cout << "Current List size: " << enemy_array.size() << std::endl;
 	}
-	// 이건 잘 알아챘네
 	enemy_array.reserve(14);
 	for (int i = 0; i < 14; ++i) {
-		enemy_array.push_back(new NM_zombie(1200, 1350, 20, 30, 27, 일반));
+		enemy_array.push_back(new NM_zombie(1200, 1200, 20, 30, 27, 일반));
 	}
 	return true;
 }

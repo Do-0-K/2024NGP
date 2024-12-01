@@ -68,7 +68,7 @@ NM_zombie::NM_zombie(float hp, float max, float spd, float def, float atk, int t
 		cur_loc = glm::vec3(z_rnd(dre), 0, -100);
 		break;
 	}
-	cur_loc = glm::vec3(0, 0, 0);
+	//cur_loc = glm::vec3(0, 0, 0);
 	cur_rot = glm::vec3(0.0f);
 
 	switch (z_type) {
@@ -169,9 +169,22 @@ NM_zombie::~NM_zombie()
 	}
 }
 
-
-void NM_zombie::walk_ani(int n)
+void NM_zombie::setPlayer(std::vector<Player*>& players)
 {
+	float minDistance = std::numeric_limits<float>::max();
+	for (const auto& player : players) {
+		glm::vec3 playerLoc = player->getLoc();
+		float distance = glm::distance(cur_loc, playerLoc);
+		if (distance < minDistance) {
+			minDistance = distance;
+			mPlayer = player;
+		}
+	}
+	
+}
+
+
+void NM_zombie::walk_ani() {
 	glm::vec3 z_pos = glm::vec3(cur_loc.x, 0, cur_loc.z);
 	glm::vec3 p_pos = glm::vec3(dynamic_cast<Player*>(mPlayer)->getLoc().x, 0, dynamic_cast<Player*>(mPlayer)->getLoc().z);
 
@@ -180,8 +193,9 @@ void NM_zombie::walk_ani(int n)
 	if (z_pos.x == p_pos.x) {
 		slope = (z_pos.z - p_pos.z) / (z_pos.x - (p_pos.x + 0.0000000001));
 	}
-	else
+	else {
 		slope = (z_pos.z - p_pos.z) / (z_pos.x - p_pos.x);
+	}
 
 	float angle = glm::atan(slope);
 	float degree = angle * 180 / glm::pi<float>();
@@ -189,16 +203,43 @@ void NM_zombie::walk_ani(int n)
 	if (z_pos.x > p_pos.x)
 		degree += 180;
 
-
 	cur_rot.x = degree;
-	glm::vec3 way = glm::normalize(glm::vec3(glm::cos(glm::radians(cur_rot.x)), 0, glm::sin(glm::radians(cur_rot.x))));
-	if (n == 0)
-		cur_loc += (speed * way) / 60.0f;
-	else
-		cur_loc -= (speed * way) / 60.0f;
-	if (glm::distance(cur_loc, p_pos) < 3)
-		cur_loc -= (speed * way) / 60.0f;
+	glm::vec3 dir = glm::normalize(glm::vec3(glm::cos(glm::radians(cur_rot.x)), 0, glm::sin(glm::radians(cur_rot.x))));
 
+
+
+	// Boundary and building collision detection
+	bool collision = false;
+
+	// Check boundaries
+	if (cur_loc.x >= 150.0f || cur_loc.x <= -150.0f) {
+		collision = true;
+	}
+	if (cur_loc.z >= 150.0f || cur_loc.z <= -150.0f) {
+		collision = true;
+	}
+
+	// Check building collision
+	if ((-150.0f <= cur_loc.x && cur_loc.x <= -50.0f) || (50.0f <= cur_loc.x && cur_loc.x <= 150.0f)) {
+		if (-150.0f <= cur_loc.z && cur_loc.z <= -50.0f) {
+			collision = true;
+		}
+		if (50.0f <= cur_loc.z && cur_loc.z <= 150.0f) {
+			collision = true;
+		}
+	}
+
+	// Reverse movement if collision occurs
+	if (collision) {
+		cur_loc -= (speed * dir) / 60.0f;
+	
+	}
+	else {
+		// Move zombie forward
+		cur_loc += (speed * dir) / 60.0f;
+	}
+
+	// Update zombie position and rotation
 	head->setLoc(cur_loc);
 	head->setRot(cur_rot);
 	body->setLoc(cur_loc);
@@ -212,6 +253,10 @@ void NM_zombie::walk_ani(int n)
 	leg[1]->setLoc(cur_loc);
 	leg[1]->setRot(cur_rot);
 }
+
+
+
+
 
 // opposite용 행렬 업데이트 함수
 void NM_zombie::UpdateMatrix()

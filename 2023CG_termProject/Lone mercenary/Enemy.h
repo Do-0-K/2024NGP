@@ -26,6 +26,8 @@ public:
 	virtual void setLoc(glm::vec3 loc);
 	virtual void setRot(glm::vec2 rot);
 
+	virtual void setHP(int hp);
+
 	virtual void UpdateMatrix() {}
 
 	void setPlayerLoc(CharacterBase*);

@@ -137,6 +137,7 @@
   <ItemGroup>
     <ClInclude Include="CharacterBase.h" />
     <ClInclude Include="Enemy.h" />
+    <ClInclude Include="ENUM.h" />
     <ClInclude Include="Field.h" />
     <ClInclude Include="FieldMap.h" />
     <ClInclude Include="GameTimer.h" />

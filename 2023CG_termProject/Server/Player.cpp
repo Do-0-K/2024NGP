@@ -60,6 +60,33 @@ glm::vec2 Player::getRot()
 	return cur_rot;
 }
 
+void Player::setLoc(glm::vec3& Pos)
+{
+    cur_loc = Pos;
+}
+
+
+
+void Player::setAtk(int attack)
+{
+    ATK = attack;
+    switch (attack)
+    {
+        
+    case 나이프:
+        ATK = 260;
+        break;
+    case 권총:
+        ATK = 250;
+        break;
+    case 라이플:
+        ATK = 270;
+        break;
+    default:
+        break;
+    }
+}
+
 glm::vec2 Player::getWepRot()
 {
 	return init_Weapon_rot;
@@ -84,11 +111,6 @@ Weapon* Player::getWeapon() const
 glm::vec3 CalculateAt(const glm::vec3& eye, const glm::vec2& angle) {
 	glm::vec3 at;
 
-	//// Calculate direction vector
-	//at.x = cos(glm::radians(angle.y)) * cos(glm::radians(angle.x));
-	//at.y = sin(glm::radians(angle.y));
-	//at.z = cos(glm::radians(angle.y)) * sin(glm::radians(angle.x));
-    //회전 각과 AT에 따른 EYE를 구한다
     float xz_dis;
     xz_dis = fabs(40 * glm::cos(glm::radians(angle.y)));
 
@@ -102,13 +124,13 @@ glm::vec3 CalculateAt(const glm::vec3& eye, const glm::vec2& angle) {
 	return atPoint;
 }
 
-void Player::attack_check(std::vector<EnemyBase*>& temp_list, PlayerInfo* playerinfo) {
-    glm::vec3 ray_first = glm::vec3(playerinfo->cameraEYE);
-    glm::vec3 ray_last = glm::vec3(CalculateAt(playerinfo->cameraEYE, playerinfo->Angle));
+void Player::attack_check(std::vector<EnemyBase*>& temp_list, UpdateInfo* updateinfo, int& weaponType) {
+    glm::vec3 ray_first = glm::vec3(updateinfo->cameraEYE);
+    glm::vec3 ray_last = glm::vec3(CalculateAt(updateinfo->cameraEYE, updateinfo->cameraangle));
     glm::vec3 ray = ray_last - ray_first;
 
     float mindist = 200.0f;
-    switch (weapon) { // 무기에 따른 사거리 설정
+    switch (weaponType) { // 무기에 따른 사거리 설정
     case 나이프:
         mindist = 200.0f;
         break;

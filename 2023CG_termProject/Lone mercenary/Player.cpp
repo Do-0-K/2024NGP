@@ -332,12 +332,23 @@ void Player::setWeapon(char type)
 void Player::attack(std::vector<EnemyBase*>& list, CameraObj* t_camera)
 {
 	if (atck) {
+		UpdateInfo updateInfo;
+		updateInfo.flag = 1;
+		updateInfo.cameraEYE = t_camera->getEYE();
+		updateInfo.cameraangle = t_camera->getAngle();
+		updateInfo.useItem[0] = false;
+		updateInfo.useItem[1] = false;
+		updateInfo.useItem[2] = false;
+		updateInfo.useItem[3] = false;
+		updateInfo.ammo = 0;
+		updateInfo.weaponType = cur_Wea->getWep();
+
 		if (cur_Wea == rifle) {
 			if (cnt % 10 == 0) {
 				cur_Wea->Shoot();
 				if (cur_Wea->exist_ammo()) {	// 총알이 있다
 					// 공격할 때 서버에게 정보 전달
-					attack_send(1); //1 = 공격 활성화
+					send(*pSock, (char*)&updateInfo, sizeof(UpdateInfo), 0);
 					mSound->play_s_shot(cur_Wea->getWep());
 					cur_rot.y += 1.0f; //반동
 					init_Weapon_rot.y += 1.0f; //반동
@@ -349,7 +360,7 @@ void Player::attack(std::vector<EnemyBase*>& list, CameraObj* t_camera)
 			if (cur_Wea == pistol) {
 				if (cur_Wea->exist_ammo()) {
 					// 공격할 때 서버에게 정보 전달
-					attack_send(1); //1 = 공격 활성화
+					send(*pSock, (char*)&updateInfo, sizeof(UpdateInfo), 0);
 					mSound->play_s_shot(cur_Wea->getWep());
 					cur_rot.y += 1.0f; //반동
 					init_Weapon_rot.y += 1.0f; //반동
@@ -357,7 +368,7 @@ void Player::attack(std::vector<EnemyBase*>& list, CameraObj* t_camera)
 			}
 			else {
 				// 공격할 때 서버에게 정보 전달
-				attack_send(1); //1 = 공격 활성화
+				send(*pSock, (char*)&updateInfo, sizeof(UpdateInfo), 0);
 				mSound->play_s_shot(cur_Wea->getWep());
 				knife_at = true;
 			}
@@ -545,11 +556,6 @@ int Player::Weapon()
 Weapon* Player::getWeapon() const
 {
 	return cur_Wea;
-}
-
-bool Player::GetItem()
-{
-	return item;
 }
 
 //void Player::attack_check(std::vector<EnemyBase*>& temp_list, CameraObj* temp_camera)
@@ -1181,12 +1187,6 @@ void Player::attack_send(int state)
 	player_state = state; //상태 지정
 	//int retval = send(*pSock, (char*)&player_state, sizeof(player_state), 0);
 }
-
-int Player::Get_flag()
-{
-	return player_state;
-}
-
 //===========================================================
 
 bool Player::getItemapp(int n)
