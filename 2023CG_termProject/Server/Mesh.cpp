@@ -6,23 +6,10 @@ bool Mesh::box_check = false;
 
 Mesh::Mesh(std::string filename, std::string f_path, int w_size, int h_size) {
 	Initialize(filename);
-	//Init_texture(f_path, w_size, h_size);
-	//ambient = glm::vec3(0.3);
 }
 
 Mesh::~Mesh()
 {
-	// 사용했으면 반환해라
-	/*glBindVertexArray(VAO);
-	glDeleteBuffers(3, VBO);
-	glDeleteTextures(1, &texture);
-	glDeleteVertexArrays(1, &VAO);
-
-	glBindVertexArray(B_VAO);
-	glDeleteBuffers(1, &B_EBO);
-	glDeleteBuffers(3, B_VBO);
-	glDeleteVertexArrays(1, &B_VAO);
-	std::cout << "Mesh 삭제" << '\n';*/
 }
 
 void Mesh::Initialize(std::string filename)

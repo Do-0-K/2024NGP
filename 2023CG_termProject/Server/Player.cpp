@@ -16,9 +16,9 @@
 Player::Player(float hp, float max, float spd, float def, float atk)
 	: CharacterBase(hp, max, spd, def, atk)
 {
-	//pistol = new Pistol("obj_source\\weapon\\pistol\\obj_pistol.obj", "obj_source\\weapon\\pistol\\texture_pistol.png", 1024, 1024, 10, 10, 250);
-	//rifle = new Rifle("obj_source\\weapon\\rifle\\obj_rifle.obj", "obj_source\\weapon\\rifle\\texture_rifle.png", 1024, 1024, 30, 30, 270);
-	//knife = new Knife("obj_source\\weapon\\knife\\Knife.obj", "obj_source\\weapon\\knife\\texture_knife.png", 1024, 1024, 1, 1, 260);
+	pistol = new Pistol("obj_source\\weapon\\pistol\\obj_pistol.obj", "obj_source\\weapon\\pistol\\texture_pistol.png", 1024, 1024, 10, 10, 250);
+	rifle = new Rifle("obj_source\\weapon\\rifle\\obj_rifle.obj", "obj_source\\weapon\\rifle\\texture_rifle.png", 1024, 1024, 30, 30, 270);
+	knife = new Knife("obj_source\\weapon\\knife\\Knife.obj", "obj_source\\weapon\\knife\\texture_knife.png", 1024, 1024, 1, 1, 260);
 
 	//rifle->init_scale(0.2);
 	//rifle->init_rotate(-90, 0, 1, 0);
@@ -39,8 +39,8 @@ Player::Player(float hp, float max, float spd, float def, float atk)
 	cur_loc = glm::vec3(0, 10, 0);				// 초기 위치 지정, 이거 바꿔주면 자연스래 카메라도 위치 바뀜
 	cur_rot = glm::vec2(0.0f, 0.0f);
 	init_Weapon_rot = glm::vec2(cur_rot.x, cur_rot.y + 90.0f);
-	
-	
+    
+
 	cnt = 0;
 	angle = 0.0f;
 	type = 0;
@@ -67,19 +67,20 @@ void Player::setLoc(glm::vec3& Pos)
 
 
 
-void Player::setAtk(int attack)
+void Player::setweapon(int attack)
 {
-    ATK = attack;
     switch (attack)
     {
-        
     case 나이프:
+        weapon = 나이프;
         ATK = 260;
         break;
     case 권총:
+        weapon = 권총;
         ATK = 250;
         break;
     case 라이플:
+        weapon = 권총;
         ATK = 270;
         break;
     default:

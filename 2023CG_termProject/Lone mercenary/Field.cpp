@@ -101,7 +101,7 @@ void Field::Update()
 	updateInfo.useItem[2] = false;
 	updateInfo.useItem[3] = false;
 	updateInfo.ammo = 0;
-	updateInfo.weaponType = 0;
+	updateInfo.weaponType = dynamic_cast<Player*>(mPlayer)->getWeapon()->getWep();
 
 	int retval = send(*m_pSock, (char*)&updateInfo, sizeof(UpdateInfo), 0);
 
@@ -186,7 +186,7 @@ void Field::Update()
 
 	// 서버가 아이템 박스 관리
 	//===================================================
-	item->check_collision();
+	//item->check_collision();
 	//item->check_time();
 	item->rot_ani();
 	//====================================================
@@ -207,6 +207,7 @@ void Field::UpdateFromPacket(void* pData)
 	}
 
 	item->setLoc(pInfo->box.Pos);
+	item->setExist(pInfo->box.exist);
 
 	glm::vec3 oppEYE = pInfo->opposite.cameraEYE;
 	glm::vec2 oppAngle = pInfo->opposite.Angle;

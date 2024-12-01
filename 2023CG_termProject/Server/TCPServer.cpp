@@ -28,7 +28,8 @@ TCPServer::TCPServer() {
 		enemyList.push_back(zombie);
 
 	}
-	item = new ItemBox(players);
+	timer = new GameTimer();
+	item = new ItemBox(players, timer);
 }
 TCPServer::~TCPServer() {
 	// Delete player
@@ -148,16 +149,16 @@ void TCPServer::AcceptClients() {
 
 	closesocket(listen_sock);
 	EnterCriticalSection(&consoleCS);
-	SetCursorPosition(0, 4);
-	std::cout << "Two clients connected. No longer accepting new connections." << std::endl;
+	//SetCursorPosition(0, 4);
+	//std::cout << "Two clients connected. No longer accepting new connections." << std::endl;
 }
 
 
 void TCPServer::Update() {
-	EnterCriticalSection(&consoleCS);
-	SetCursorPosition(0, 2);
-	std::cout << "Updating game state..." << std::endl;
-	LeaveCriticalSection(&consoleCS);
+	//EnterCriticalSection(&consoleCS);
+	//SetCursorPosition(0, 2);
+	//std::cout << "Updating game state..." << std::endl;
+	//LeaveCriticalSection(&consoleCS);
 
 	// Update enemy positions
 	for (auto& enemy : enemyList) {
@@ -181,18 +182,19 @@ void TCPServer::Update() {
 	}
 
 	//=========================================================start Dong-ki-wow~
-
-
-
+	//==========================================================
+	item->check_collision();
+	item->check_time();
+	//==========================================================
 	// Print current state to console
 	EnterCriticalSection(&consoleCS);
 	for (int i = 0; i < clientCount; ++i) {
 		SetCursorPosition(0, 6 + i * 6);
 		std::cout << "Client[" << i + 1 << "] Info: " << std::endl;
-		std::cout << "Position: (" << playerinfo[i].cameraEYE.x << ", "
-			<< playerinfo[i].cameraEYE.y << ", " << playerinfo[i].cameraEYE.z << ")" << std::endl;
-		std::cout << "Angle: (" << playerinfo[i].Angle.x << ", "
-			<< playerinfo[i].Angle.y << ")" << std::endl;
+		std::cout << "Position: (" << updateInfo[i].cameraEYE.x << ", "
+			<< updateInfo[i].cameraEYE.y << ", " << updateInfo[i].cameraEYE.z << ")" << std::endl;
+		std::cout << "Angle: (" << updateInfo[i].cameraangle.x << ", "
+			<< updateInfo[i].cameraangle.y << ")" << std::endl;
 		std::cout << "첫번쨰 좀비의 좌표 x:" << enemyList[0]->getLoc().x <<" y:" << enemyList[0]->getLoc().y << " z:" << enemyList[0]->getLoc().z << endl;
 	}
 	LeaveCriticalSection(&consoleCS);
@@ -221,19 +223,18 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
 		recvSize = recv(clientSocket, (char*)&server->updateInfo[clientIndex], sizeof(server->updateInfo[clientIndex]), MSG_WAITALL);
 		//recvSize = recv(clientSocket, (char*)&server->playerinfo[clientIndex], sizeof(server->playerinfo[clientIndex]), MSG_WAITALL);		//임시로 만든거 이제 지울거임
 		if (recvSize <= 0) {
-			EnterCriticalSection(&server->consoleCS);
-			SetCursorPosition(0, 5);
+			//EnterCriticalSection(&server->consoleCS);
+			//SetCursorPosition(0, 5);
 			std::cout << "Client " << clientIndex << " disconnected or error occurred. Closing connection." << std::endl;
-			LeaveCriticalSection(&server->consoleCS);
+			//LeaveCriticalSection(&server->consoleCS);
 			break;
 		}
 
 		server->players[clientIndex]->setLoc(server->updateInfo[clientIndex].cameraEYE);		//임시 코드 updateinfo로 하면 지울거
-
 		// 1이 공격 0이 이동
 		if (server->updateInfo[clientIndex].flag == 1) {
 			int weaponNumber = server->updateInfo[clientIndex].weaponType;
-			server->players[clientIndex]->setAtk(weaponNumber);
+			server->players[clientIndex]->setweapon(weaponNumber);
 			// 여기서 이벤트 사용 하나 더 할 예정
 			// std::cout << "Player " << clientIndex << " is attacking!" << std::endl;
 			// 여기에 좀비 체력 업데이트 함수 사용
@@ -291,6 +292,7 @@ void TCPServer::FillRenderInfo(RenderInfo& renderInfo, const std::vector<EnemyBa
 	}
 
 	renderInfo.box.Pos = item->Get_Loc();
+	renderInfo.box.Exist = item->Get_Exist();
 	//renderInfo.alive_num = enemyList.size(); // Total number of enemies
 	//renderInfo.remainTime = player->getRemainingTime();
 }

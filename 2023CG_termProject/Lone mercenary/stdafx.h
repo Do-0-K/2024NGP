@@ -43,6 +43,7 @@ struct ObjectInfo {         // Store object(enemy, box, etc.) information
     int HP;
     glm::vec3 Pos;
     glm::vec2 Rot;
+    bool exist;
 };
 
 struct RenderInfo {         // The packet which server sends to client

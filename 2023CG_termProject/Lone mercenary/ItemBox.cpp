@@ -58,4 +58,10 @@ void ItemBox::rot_ani()
 void ItemBox::setLoc(glm::vec3 pos) //서버에서 받은 박스 위치를 set
 {
 	cur_loc = pos;
+	box->setLoc(cur_loc);
+}
+
+void ItemBox::setExist(bool ex)
+{
+	exist = ex;
 }

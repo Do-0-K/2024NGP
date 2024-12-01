@@ -25,7 +25,7 @@ public:
 
 	void plusammo(int);
 protected:
-	int weapon_num;			// 무기 번호
+	int weapon_num=0;			// 무기 번호
 
 	int max_ammo;
 	int total_ammo;			// 총 탄약 수

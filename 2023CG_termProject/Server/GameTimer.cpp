@@ -5,8 +5,7 @@ int GameTimer::p_num10 = 0;
 int GameTimer::p_num1 = 0;
 int GameTimer::remaining_time = 0;
 
-GameTimer::GameTimer(CharacterBase* t_player)
-	: mPlayer(t_player)
+GameTimer::GameTimer()
 {
 	start_time = clock();
 	remaining_time = 180;	//180√ 
