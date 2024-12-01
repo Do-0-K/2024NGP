@@ -161,16 +161,16 @@ void TCPServer::Update() {
 	//LeaveCriticalSection(&consoleCS);
 
 	// Update enemy positions
-	for (auto& enemy : enemyList) {
-		NM_zombie* zombie = dynamic_cast<NM_zombie*>(enemy);
+	for (int i = 0; i < enemyList.size(); ++i) {
+		NM_zombie* zombie = dynamic_cast<NM_zombie*>(enemyList[i]);
 		zombie->setPlayer(players);
 		if (!zombie->Death_check()) {  // Check if the zombie is alive
-			zombie->walk_ani();  // Move the zombie toward the player
+			zombie->walk_ani(enemyList.data(), i); // Pass parameters to walk_ani
 		}
 		else {
 			// Revive the zombie if it's dead
-			zombie->Update_HP(1200); // Restore health
-			zombie->randLoc(); // Move to a random location
+
+			zombie->Revive(); // Move to a random location
 		}
 	}
 	

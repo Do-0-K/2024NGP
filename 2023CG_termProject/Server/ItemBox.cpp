@@ -37,15 +37,15 @@ void ItemBox::check_collision()
 				if (uid(dre) <= heal || dynamic_cast<Player*>(mPlayer[n])->Weapon() == 나이프)
 					mPlayer[n]->Update_HP(50);
 				else {
-					if (n == 0) {
+					if (n == 0) { //원하는 내용 넣으면 될 듯
 						//dynamic_cast<Player*>(mPlayer[0])->getWeapon()->plusammo(40);
 						//dynamic_cast<Player*>(mPlayer[1])->getWeapon()->plusammo(-20);
-						mPlayer[1]->Update_HP(-20);
+						mPlayer[1]->Update_HP(-40);
 					}
 					else {
 						//dynamic_cast<Player*>(mPlayer[0])->getWeapon()->plusammo(-20);
 						//dynamic_cast<Player*>(mPlayer[1])->getWeapon()->plusammo(40);
-						mPlayer[0]->Update_HP(-20);
+						mPlayer[0]->Update_HP(-40);
 					}
 				}
 
