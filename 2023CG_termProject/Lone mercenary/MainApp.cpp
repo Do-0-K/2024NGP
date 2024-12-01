@@ -176,7 +176,8 @@ void MainApp::MainAppConnect()
 
 	// 호스트의 IP 주소를 알아내기
 	//const char* hostName = "DESKTOP-SNG2JRJ";// 서버로 사용할 호스트 이름
-	const char* hostName = "joke";
+	//const char* hostName = "joke";
+	const char* hostName = "도트북";
 	hostent* ptr = gethostbyname(hostName);
 	if (ptr == nullptr) {
 		std::cout << "can't find Hostname" << std::endl;

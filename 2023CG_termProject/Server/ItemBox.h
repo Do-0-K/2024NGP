@@ -7,10 +7,11 @@
 #include "stdafx.h"
 #include "Mesh.h"
 #include "GameTimer.h"
+#include "Player.h"
 
 class ItemBox {
 public:
-	ItemBox(GameTimer*, CharacterBase*);
+	ItemBox(std::vector<Player*>);
 	~ItemBox();
 
 	void check_collision();
@@ -19,9 +20,12 @@ public:
 
 	void rot_ani();
 
+	glm::vec3 Get_Loc() { return cur_loc; } //TCPServer.cpp에서 가져와서 보내면 될 듯
+	glm::vec2 Get_Rot() { return cur_rot; } //TCPServer.cpp에서 가져와서 보내면 될 듯
+
 private:
-	GameTimer* timer;
-	CharacterBase* mPlayer;
+	//GameTimer* timer;
+	std::vector<Player*> mPlayer;
 	Mesh* box;
 
 	bool  exist;

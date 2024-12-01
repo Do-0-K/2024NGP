@@ -6,12 +6,13 @@
 #include "stdafx.h"
 #include "NM_zombie.h"
 #include "Player.h"
-
+#include "ItemBox.h"
 
 #define Portnum 25715
 #define MAX_ENEMY_COUNT 100  // 최대 적 생성 개수
 class TCPServer;
 class Player;
+class ItemBox;
 
 struct ThreadArg {
     SOCKET clientSocket;
@@ -48,7 +49,8 @@ private:
    int max_enemycount = 14;
     std::vector<EnemyBase*> enemyList;  // Enemy list
     std::vector<Player*> players;  // Enemy list
-   
+    ItemBox* item = NULL;
+
     static UpdateInfo updateInfo[2];           // Update information for 2 clients
     static RenderInfo renderInfo[2];           // Render information for 2 clients
     static PlayerInfo playerinfo[2];           // 임시로 만든거

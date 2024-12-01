@@ -1,7 +1,7 @@
 #include "ItemBox.h"
 
-ItemBox::ItemBox(GameTimer* t_time, CharacterBase* t_play)
-	: timer(t_time), mPlayer(t_play)
+ItemBox::ItemBox(std::vector<Player*> t_play)
+	: mPlayer(t_play)
 {
 	box = new Mesh("obj_source\\field\\item_box.obj", "obj_source\\field\\item_box.png", 1024, 1024);
 	box->init_scale(0.5);
@@ -14,9 +14,7 @@ ItemBox::ItemBox(GameTimer* t_time, CharacterBase* t_play)
 ItemBox::~ItemBox()
 {
 	delete box;
-	timer = nullptr;
-	mPlayer = nullptr;
-
+	mPlayer.clear();
 }
 
 
@@ -24,23 +22,34 @@ ItemBox::~ItemBox()
 void ItemBox::check_collision()
 {
 	if (exist) {
-		if (glm::distance(glm::vec3(dynamic_cast<Player*>(mPlayer)->getLoc().x , 0, dynamic_cast<Player*>(mPlayer)->getLoc().z), cur_loc) < 5) {
-			exist = false;
-			l_time = clock();
-			int heal = 2;
-			if (mPlayer->getHP() < 100) {
-				heal = 6;
+		for (int n = 0; n < 2; ++n) {
+			if (glm::distance(glm::vec3(dynamic_cast<Player*>(mPlayer[n])->getLoc().x, 0, dynamic_cast<Player*>(mPlayer[n])->getLoc().z), cur_loc) < 5) {
+				exist = false;
+				int heal = 2;
+				if (mPlayer[n]->getHP() < 100) {
+					heal = 6;
+				}
+				std::random_device rd;
+				std::default_random_engine dre(rd());
+				std::uniform_int_distribution<int> uid(1, 10);
+
+
+
+				if (uid(dre) <= heal || dynamic_cast<Player*>(mPlayer[n])->getWeapon()->getWep() == 나이프)
+					mPlayer[n]->Update_HP(50);
+				else {
+					if (n == 0) {
+						dynamic_cast<Player*>(mPlayer[0])->getWeapon()->plusammo(40);
+						dynamic_cast<Player*>(mPlayer[1])->getWeapon()->plusammo(-20);
+					}
+					else {
+						dynamic_cast<Player*>(mPlayer[0])->getWeapon()->plusammo(-20);
+						dynamic_cast<Player*>(mPlayer[1])->getWeapon()->plusammo(40);
+					}
+				}
+
+				break;
 			}
-			std::random_device rd;
-			std::default_random_engine dre(rd());
-			std::uniform_int_distribution<int> uid(1, 10);
-
-			
-
-			if (uid(dre) <= heal || dynamic_cast<Player*>(mPlayer)->getWeapon()->getWep() == 나이프)
-				mPlayer->Update_HP(50);
-			else
-				dynamic_cast<Player*>(mPlayer)->getWeapon()->plusammo(100);
 		}
 	}
 }
@@ -56,7 +65,7 @@ void ItemBox::rot_ani()
 }
 
 
-void ItemBox::check_time()
+void ItemBox::check_time() //서버에는 타이머가 있으니 사용해서 회전 값을 설정하고 그것을 보내면 될 듯
 {
 	if (not exist) {
 		i_time = clock();
@@ -68,7 +77,7 @@ void ItemBox::check_time()
 	}
 }
 
-void ItemBox::setLoc()
+void ItemBox::setLoc() //좌표 설정하고 보내기만 하면 된다.
 {
 	std::random_device rd;
 	std::default_random_engine dre(rd());

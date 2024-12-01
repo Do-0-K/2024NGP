@@ -28,6 +28,7 @@ TCPServer::TCPServer() {
 		enemyList.push_back(zombie);
 
 	}
+	item = new ItemBox(players);
 }
 TCPServer::~TCPServer() {
 	// Delete player
@@ -289,6 +290,7 @@ void TCPServer::FillRenderInfo(RenderInfo& renderInfo, const std::vector<EnemyBa
 		renderInfo.alive_enemy[i].Rot = enemyList[i]->getRot();
 	}
 
+	renderInfo.box.Pos = item->Get_Loc();
 	//renderInfo.alive_num = enemyList.size(); // Total number of enemies
 	//renderInfo.remainTime = player->getRemainingTime();
 }
