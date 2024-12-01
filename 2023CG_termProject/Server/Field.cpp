@@ -10,6 +10,11 @@
 
 int Field::first_zom = 0;
 
+Field::Field()
+{
+
+}
+
 Field::Field(CharacterBase* t_player, std::vector<EnemyBase*>& t_list, std::shared_ptr<SOCKET>& pSock)
 	: mPlayer(t_player), enemy_list(t_list)
 {

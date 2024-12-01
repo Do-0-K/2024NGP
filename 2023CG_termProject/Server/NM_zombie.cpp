@@ -184,7 +184,7 @@ void NM_zombie::setPlayer(std::vector<Player*>& players)
 }
 
 
-void NM_zombie::walk_ani() {
+void NM_zombie::walk_ani(EnemyBase* t_list[], int myNum) {
 	glm::vec3 z_pos = glm::vec3(cur_loc.x, 0, cur_loc.z);
 	glm::vec3 p_pos = glm::vec3(dynamic_cast<Player*>(mPlayer)->getLoc().x, 0, dynamic_cast<Player*>(mPlayer)->getLoc().z);
 
@@ -228,7 +228,28 @@ void NM_zombie::walk_ani() {
 			collision = true;
 		}
 	}
-
+	// 좀비 간 충돌
+	for (int i = 0; i < myNum; ++i) {
+		if (dynamic_cast<NM_zombie*>(t_list[myNum])->getlarm()->collision_check(
+			*(dynamic_cast<NM_zombie*>(t_list[i])->getlarm())) ||
+			dynamic_cast<NM_zombie*>(t_list[myNum])->getlarm()->collision_check(
+				*(dynamic_cast<NM_zombie*>(t_list[i])->getrarm())) ||
+			dynamic_cast<NM_zombie*>(t_list[myNum])->getlarm()->collision_check(
+				*(dynamic_cast<NM_zombie*>(t_list[i])->getbody())) ||
+			dynamic_cast<NM_zombie*>(t_list[myNum])->getrarm()->collision_check(
+				*(dynamic_cast<NM_zombie*>(t_list[i])->getlarm())) ||
+			dynamic_cast<NM_zombie*>(t_list[myNum])->getrarm()->collision_check(
+				*(dynamic_cast<NM_zombie*>(t_list[i])->getrarm())) ||
+			dynamic_cast<NM_zombie*>(t_list[myNum])->getrarm()->collision_check(
+				*(dynamic_cast<NM_zombie*>(t_list[i])->getbody())) ||
+			dynamic_cast<NM_zombie*>(t_list[myNum])->getbody()->collision_check(
+				*(dynamic_cast<NM_zombie*>(t_list[i])->getlarm())) ||
+			dynamic_cast<NM_zombie*>(t_list[myNum])->getbody()->collision_check(
+				*(dynamic_cast<NM_zombie*>(t_list[i])->getrarm())) ||
+			dynamic_cast<NM_zombie*>(t_list[myNum])->getbody()->collision_check(
+				*(dynamic_cast<NM_zombie*>(t_list[i])->getbody())))
+			collision = true;
+	}
 	// Reverse movement if collision occurs
 	if (collision) {
 		cur_loc -= (speed * dir) / 60.0f;
@@ -238,7 +259,8 @@ void NM_zombie::walk_ani() {
 		// Move zombie forward
 		cur_loc += (speed * dir) / 60.0f;
 	}
-
+	if (glm::distance(cur_loc, p_pos) < 3)
+		cur_loc -= (speed * dir) / 60.0f;
 	// Update zombie position and rotation
 	head->setLoc(cur_loc);
 	head->setRot(cur_rot);

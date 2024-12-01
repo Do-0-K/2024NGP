@@ -16,7 +16,7 @@ public:
 	virtual ~EnemyBase() {
 		
 	}
-	void randLoc();
+	void Revive();
 	virtual void walk_ani(int n) {};
 	virtual void walk_ani(int n, std::vector<Player*>& players) {}
 	virtual void attack();
