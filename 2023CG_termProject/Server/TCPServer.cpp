@@ -234,13 +234,11 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
 		// 1이 공격 0이 이동
 		if (server->updateInfo[clientIndex].flag == 1) {
 			int weaponNumber = server->updateInfo[clientIndex].weaponType;
-			server->players[clientIndex]->setAtk(weaponNumber);
+			server->players[clientIndex]->setweapon(weaponNumber);
 			server->players[clientIndex]->attack_check(server->enemyList, &server->updateInfo[clientIndex], weaponNumber);
 			// 여기서 이벤트 사용 하나 더 할 예정
 			// std::cout << "Player " << clientIndex << " is attacking!" << std::endl;
 			// 여기에 좀비 체력 업데이트 함수 사용
-
-			// 이게 체력 업데이트?
 			WaitForSingleObject(server->hWriteEvent, INFINITE);
 			//SetCursorPosition(0, 20);
 			//std::cout << "클라이언트" << clientIndex + 1 << "가 공격" << std::endl;

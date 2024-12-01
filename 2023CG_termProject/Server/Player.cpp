@@ -67,19 +67,22 @@ void Player::setLoc(glm::vec3& Pos)
 
 
 
-void Player::setAtk(int attack)
+void Player::setweapon(int attack)
 {
-    ATK = attack;
+   
     switch (attack)
     {
         
-    case 나이프:
+    case 0:
+        weapon = 0;
         ATK = 260;
         break;
-    case 권총:
+    case 1:
+        weapon = 1;
         ATK = 250;
         break;
-    case 라이플:
+    case 2:
+        weapon = 2;
         ATK = 270;
         break;
     default:
