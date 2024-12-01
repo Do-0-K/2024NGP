@@ -9,6 +9,7 @@
 #include "NMMesh.h"
 #include "Player.h"
 
+
 class Player;
 
 class NM_zombie : public EnemyBase {
@@ -17,7 +18,7 @@ public:
 	NM_zombie(float hp, float max, float spd, float def, float atk, int type);
 	~NM_zombie();
 	void setPlayer(std::vector<Player*>& players);
-	void walk_ani();
+	void walk_ani(EnemyBase* t_list[], int myNum);
 	
 	void setHit(bool);
 	void UpdateMatrix();

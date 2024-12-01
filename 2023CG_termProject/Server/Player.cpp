@@ -240,7 +240,7 @@ void Player::attack_check(std::vector<EnemyBase*>& temp_list, UpdateInfo* update
 
     if (closestZombieIndex != -1) {
         aliveEnemy[closestZombieIndex]->Update_HP(-ATK); // 공격력만큼 체력 감소
-      //  std::cout << "Zombie hit! Remaining HP: " << aliveEnemy[closestZombieIndex]->getHP() << std::endl;
+        std::cout << "Zombie hit! Remaining HP: " << aliveEnemy[closestZombieIndex]->getHP() << std::endl;
         
         if (aliveEnemy[closestZombieIndex]->Death_check()) {
             std::cout << "Zombie killed!" << std::endl;
