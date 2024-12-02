@@ -45,6 +45,7 @@ Player::Player(float hp, float max, float spd, float def, float atk)
 	angle = 0.0f;
 	type = 0;
 	bonus_atack = 0;
+    score = 0;
 
 	
 }
@@ -66,6 +67,16 @@ void Player::setLoc(glm::vec3& Pos)
 }
 
 
+
+void Player::Plusscore(const int& n)
+{
+    score += n;
+}
+
+int Player::getScore()
+{
+    return score;
+}
 
 void Player::setweapon(int attack)
 {
@@ -248,10 +259,12 @@ void Player::attack_check(std::vector<EnemyBase*>& temp_list, UpdateInfo* update
         temp_list[closestZombieIndex]->Update_HP(-(ATK + bonus_atack)); // 공격력 + 보너스 공격력 적용
 
         bonus_atack = 0;
-        std::cout << "Zombie hit!" << closestZombieIndex<<"번째 좀비 " << "Remaining HP : " << temp_list[closestZombieIndex]->getHP() << std::endl;
-
+      /*  std::cout << "Zombie hit!" << closestZombieIndex<<"번째 좀비 " << "Remaining HP : " << temp_list[closestZombieIndex]->getHP() << std::endl;
+        std::cout << "contact_distance: " << contact_distance[closestZombieIndex] << "distance: " << glm::distance(temp_list[closestZombieIndex]->getLoc(), updateinfo->cameraEYE) << endl;*/
         if (temp_list[closestZombieIndex]->Death_check()) {
             std::cout << "Zombie killed!" << std::endl;
+            Plusscore(50);
+            std::cout << "SCORE: " <<score<< std::endl;
         }
     }
 }
