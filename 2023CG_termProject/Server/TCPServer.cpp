@@ -23,7 +23,11 @@ TCPServer::TCPServer() {
 	InitializeCriticalSection(&consoleCS);
 	// Create and initialize enemies
 	for (int i = 0; i < 14; ++i) {
-		NM_zombie* zombie = new NM_zombie(1200, 1200, 20, 30, 27, 일반);
+		NM_zombie* zombie;
+		if(i == 0)
+			zombie = new NM_zombie(600, 1200, 20, 30, 27, 일반);
+		else
+			zombie = new NM_zombie(1200, 1200, 20, 30, 27, 일반);
 		//zombie->setPlayer(players); // Player 객체 전달
 		enemyList.push_back(zombie);
 
@@ -172,6 +176,7 @@ void TCPServer::Update() {
 
 			zombie->Revive(); // Move to a random location
 		}
+		zombie->UpdateMatrix();
 	}
 
 
@@ -235,11 +240,11 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
 		if (server->updateInfo[clientIndex].flag == 1) {
 			int weaponNumber = server->updateInfo[clientIndex].weaponType;
 			server->players[clientIndex]->setweapon(weaponNumber);
+			WaitForSingleObject(server->hWriteEvent, INFINITE);
 			server->players[clientIndex]->attack_check(server->enemyList, &server->updateInfo[clientIndex], weaponNumber);
 			// 여기서 이벤트 사용 하나 더 할 예정
 			// std::cout << "Player " << clientIndex << " is attacking!" << std::endl;
 			// 여기에 좀비 체력 업데이트 함수 사용
-			WaitForSingleObject(server->hWriteEvent, INFINITE);
 			//SetCursorPosition(0, 20);
 			//std::cout << "클라이언트" << clientIndex + 1 << "가 공격" << std::endl;
 		

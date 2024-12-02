@@ -121,10 +121,9 @@ glm::vec3 CalculateAt(const glm::vec3& eye, const glm::vec2& angle) {
     at.y = eye.y + (40 * glm::sin(glm::radians(angle.y)));
     at.z = eye.z + (xz_dis * glm::sin(glm::radians(angle.x)));
 
-	// The "at" point in world space
-	glm::vec3 atPoint = eye + at;
 
-	return atPoint;
+
+	return at;
 }
 
 void Player::attack_check(std::vector<EnemyBase*>& temp_list, UpdateInfo* updateinfo, int& weaponType) {
@@ -209,6 +208,7 @@ void Player::attack_check(std::vector<EnemyBase*>& temp_list, UpdateInfo* update
                 if (contact_distance[i] == 0.0f || dist < contact_distance[i]) {
                     contact_distance[i] = dist;
                     is_contact = true;
+
                 }
             }
 
