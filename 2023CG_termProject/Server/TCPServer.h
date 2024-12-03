@@ -38,7 +38,8 @@ private:
     std::vector<HANDLE> client_events; // Event objects for thread synchronization
     
     // Event for synchronization
-    std::vector<HANDLE> m_hUpdateEvent;  // 업데이트 완료 시 신호
+    //std::vector<HANDLE> m_hUpdateEvent;  // 업데이트 완료 시 신호
+    HANDLE m_hUpdateEvent;
 
     //HANDLE hReadEvent;
     HANDLE hWriteEvent;
@@ -52,4 +53,8 @@ private:
     static UpdateInfo updateInfo[2];           // Update information for 2 clients
     static RenderInfo renderInfo[2];           // Render information for 2 clients
     static PlayerInfo playerinfo[2];           // 임시로 만든거
+
+    __int64 m_nQueryPerfomancFrequency;
+    __int64 m_nLastTime;
+    __int64 m_nCurrentTime;
 };

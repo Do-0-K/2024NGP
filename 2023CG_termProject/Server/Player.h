@@ -52,7 +52,7 @@ public:
 	void setLoc(glm::vec3& Pos);				// 위치 설정하기	EYE
 	void setRot(glm::vec2& At);				//  방향 설정하기	AT
 	void Plusscore(const int& n);
-	int getS();
+	int getScore();
 	void setweapon(int attack);
 	glm::vec2 getWepRot();			// 현재 바라보는 방향에 맞춰 총기위치 지정하기
 	float getammo();

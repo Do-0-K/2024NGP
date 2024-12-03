@@ -32,6 +32,7 @@ TCPServer::TCPServer() {
 		enemyList.push_back(zombie);
 
 	}
+	m_hUpdateEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 }
 TCPServer::~TCPServer() {
 	// Delete player
@@ -102,17 +103,26 @@ void TCPServer::Execute() {
 	std::cout << "Waiting for clients to connect..." << std::endl;
 	AcceptClients();
 
+	::QueryPerformanceFrequency((LARGE_INTEGER*)&m_nQueryPerfomancFrequency);
+	float timeScale = 1.0f / m_nQueryPerfomancFrequency;
+
+	::QueryPerformanceCounter((LARGE_INTEGER*)&m_nLastTime);
+	float fElapsedTime;
 	while (true) {
-		// Wait for all threads to signal their events
-		WaitForMultipleObjects(clientCount, client_events.data(), TRUE, INFINITE);
-		// Update game state
-		Update();
-
-		// 업데이트 끝나면 이벤트 신호상태
-		for (int i = 0; i < clientCount; ++i) {
-			SetEvent(m_hUpdateEvent[i]);
+		::QueryPerformanceCounter((LARGE_INTEGER*)&m_nCurrentTime);
+		fElapsedTime = (m_nCurrentTime - m_nLastTime) * timeScale;		// 
+		while (fElapsedTime < (1.0f / 60.0f)) {
+			::QueryPerformanceCounter((LARGE_INTEGER*)&m_nCurrentTime);
+			fElapsedTime = (m_nCurrentTime - m_nLastTime) * timeScale;
 		}
+		m_nLastTime = m_nCurrentTime;
+		// Wait for all threads to signal their events
+		//WaitForMultipleObjects(clientCount, client_events.data(), TRUE, INFINITE);
+		// Update game state
 
+		ResetEvent(m_hUpdateEvent);
+		Update();
+		SetEvent(m_hUpdateEvent);
 	}
 }
 void TCPServer::AcceptClients() {
@@ -134,8 +144,8 @@ void TCPServer::AcceptClients() {
 		client_sockets.push_back(clientSocket);
 		/*HANDLE clientEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 		client_events.push_back(clientEvent);*/
-		client_events.push_back(CreateEvent(NULL, FALSE, FALSE, NULL));
-		m_hUpdateEvent.push_back(CreateEvent(NULL, TRUE, FALSE, NULL));
+		//client_events.push_back(CreateEvent(NULL, FALSE, FALSE, NULL));
+		//m_hUpdateEvent.push_back(CreateEvent(NULL, TRUE, FALSE, NULL));
 
 		// Prepare ThreadArg
 		ThreadArg* data = new ThreadArg{ client_sockets[clientCount], clientCount, this };
@@ -223,7 +233,7 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
 
 	// Main thread loop
 	while (true) {
-		ResetEvent(server->m_hUpdateEvent[clientIndex]);
+		//ResetEvent(server->m_hUpdateEvent[clientIndex]);
 		// Receive PlayerInfo structure from client
 		recvSize = recv(clientSocket, (char*)&server->updateInfo[clientIndex], sizeof(server->updateInfo[clientIndex]), MSG_WAITALL);
 		if (recvSize <= 0) {
@@ -253,9 +263,9 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
 			continue;
 		}
 
-		SetEvent(server->client_events[clientIndex]);
+		//SetEvent(server->client_events[clientIndex]);
 
-		WaitForSingleObject(server->m_hUpdateEvent[clientIndex], INFINITE);
+		WaitForSingleObject(server->m_hUpdateEvent, INFINITE);
 
 	//// Prepare renderInfo to send back to the client
 		server->FillRenderInfo(server->renderInfo[clientIndex], server->enemyList, server->players[clientIndex]);
