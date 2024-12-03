@@ -145,13 +145,13 @@ void Player::attack_check(std::vector<EnemyBase*>& temp_list, UpdateInfo* update
     float mindist = 200.0f;
     switch (weaponType) { // 무기에 따른 사거리 설정
     case 나이프:
-        mindist = 200.0f;
+        mindist = 100.0f;
         break;
     case 권총:
-        mindist = 3000.0f;
+        mindist = 2000.0f;
         break;
     case 라이플:
-        mindist = 8000.0f;
+        mindist = 4000.0f;
         break;
     }
 

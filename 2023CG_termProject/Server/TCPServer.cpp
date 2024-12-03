@@ -180,6 +180,7 @@ void TCPServer::Update() {
 		zombie->setPlayer(players);
 		if (!zombie->Death_check()) {  // Check if the zombie is alive
 			zombie->walk_ani(enemyList.data(), i); // Pass parameters to `walk_ani`
+			zombie->attack();
 		}
 		else {
 			// Revive the zombie if it's dead
@@ -291,7 +292,7 @@ void TCPServer::FillRenderInfo(RenderInfo& renderInfo, const std::vector<EnemyBa
 		renderInfo.alive_enemy[i].Rot = enemyList[i]->getRot();
 	}
 
-	//renderInfo.alive_num = enemyList.size(); // Total number of enemies
+	
 	//renderInfo.remainTime = player->getRemainingTime();
 }
 
