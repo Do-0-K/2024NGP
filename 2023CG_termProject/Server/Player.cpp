@@ -244,7 +244,10 @@ void Player::attack_check(std::vector<EnemyBase*>& temp_list, UpdateInfo* update
                     zombie->setHit(true); 
                     bonus_atack += ATK;   // 보너스 공격력 증가
                     std::cout << "Headshot! Bonus attack applied." << std::endl;
+
                 }
+                else
+                    std::cout << "Not Headshot!" << std::endl;
                 is_contact = false;
                 break; // 부위별 충돌 검사 중 하나만 충돌해도 나머지는 검사하지 않음
             }
@@ -272,9 +275,9 @@ void Player::attack_check(std::vector<EnemyBase*>& temp_list, UpdateInfo* update
       /*  std::cout << "Zombie hit!" << closestZombieIndex<<"번째 좀비 " << "Remaining HP : " << temp_list[closestZombieIndex]->getHP() << std::endl;
         std::cout << "contact_distance: " << contact_distance[closestZombieIndex] << "distance: " << glm::distance(temp_list[closestZombieIndex]->getLoc(), updateinfo->cameraEYE) << endl;*/
         if (temp_list[closestZombieIndex]->Death_check()) {
-            std::cout << "Zombie killed!" << std::endl;
+            //std::cout << "Zombie killed!" << std::endl;
             Plusscore(50);
-            std::cout << "SCORE: " <<score<< std::endl;
+           // std::cout << "SCORE: " <<score<< std::endl;
         }
     }
 }
