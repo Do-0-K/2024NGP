@@ -24,15 +24,12 @@ TCPServer::TCPServer() {
 	// Create and initialize enemies
 	for (int i = 0; i < 14; ++i) {
 		NM_zombie* zombie;
-		if(i == 0)
-			zombie = new NM_zombie(600, 1200, 20, 30, 27, 일반);
-		else
-			zombie = new NM_zombie(1200, 1200, 20, 30, 27, 일반);
+		//zombie = new NM_zombie(1200, 1200, 20, 30, 27, 일반);
+		zombie = new NM_zombie(1200, 1200, 10, 30, 27, 일반);
 		//zombie->setPlayer(players); // Player 객체 전달
 		enemyList.push_back(zombie);
 
 	}
-	m_hUpdateEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 }
 TCPServer::~TCPServer() {
 	// Delete player
@@ -107,7 +104,6 @@ void TCPServer::Execute() {
 	float timeScale = 1.0f / m_nQueryPerfomancFrequency;
 
 	::QueryPerformanceCounter((LARGE_INTEGER*)&m_nLastTime);
-	float fElapsedTime;
 	while (true) {
 		::QueryPerformanceCounter((LARGE_INTEGER*)&m_nCurrentTime);
 		fElapsedTime = (m_nCurrentTime - m_nLastTime) * timeScale;		// 
@@ -117,14 +113,14 @@ void TCPServer::Execute() {
 		}
 		m_nLastTime = m_nCurrentTime;
 		// Wait for all threads to signal their events
-		//WaitForMultipleObjects(clientCount, client_events.data(), TRUE, INFINITE);
+		// WaitForMultipleObjects(clientCount, client_events.data(), TRUE, INFINITE);
 		// Update game state
-
-		ResetEvent(m_hUpdateEvent);
 		Update();
-		SetEvent(m_hUpdateEvent);
+		timerElapsedTime += fElapsedTime;
+
 	}
 }
+
 void TCPServer::AcceptClients() {
 	sockaddr_in clientaddr;
 	int addrlen = sizeof(clientaddr);
@@ -137,15 +133,8 @@ void TCPServer::AcceptClients() {
 			continue;
 		}
 		cout << "클라이언트[" << clientCount + 1 << "]" << "가 입장했습니다" << endl;
-		/*std::cout << "Client connected. Address: " << inet_ntoa(clientaddr.sin_addr)
-			<< ", Port: " << ntohs(clientaddr.sin_port) << std::endl;*/
-
 
 		client_sockets.push_back(clientSocket);
-		/*HANDLE clientEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-		client_events.push_back(clientEvent);*/
-		//client_events.push_back(CreateEvent(NULL, FALSE, FALSE, NULL));
-		//m_hUpdateEvent.push_back(CreateEvent(NULL, TRUE, FALSE, NULL));
 
 		// Prepare ThreadArg
 		ThreadArg* data = new ThreadArg{ client_sockets[clientCount], clientCount, this };
@@ -157,7 +146,6 @@ void TCPServer::AcceptClients() {
 		++clientCount;
 	}
 
-	//hReadEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	hWriteEvent = CreateEvent(NULL, FALSE, TRUE, NULL);
 
 	closesocket(listen_sock);
@@ -173,6 +161,8 @@ void TCPServer::Update() {
 	SetCursorPosition(0, 2);
 	std::cout << "Updating game state..." << std::endl;
 	LeaveCriticalSection(&consoleCS);*/
+
+	m_itemBox.AnimateObject(fElapsedTime);
 
 	// Update enemy positions
 	for (int i = 0; i < enemyList.size(); ++i) {
@@ -197,30 +187,19 @@ void TCPServer::Update() {
 		renderInfo[1].opposite = { updateInfo[0].cameraEYE, updateInfo[0].cameraangle };
 	}
 
-	//=========================================================start Dong-ki-wow~
 
-
-
-	{// Print current state to console
-	/*EnterCriticalSection(&consoleCS);
-	for (int i = 0; i < clientCount; ++i) {
-		SetCursorPosition(0, 6 + i * 6);
-		std::cout << "Client[" << i + 1 << "] Info: " << std::endl;
-		std::cout << "Position: (" << playerinfo[i].cameraEYE.x << ", "
-			<< playerinfo[i].cameraEYE.y << ", " << playerinfo[i].cameraEYE.z << ")" << std::endl;
-		std::cout << "Angle: (" << playerinfo[i].Angle.x << ", "
-			<< playerinfo[i].Angle.y << ")" << std::endl;
-		std::cout << "첫번쨰 좀비의 좌표 x:" << enemyList[0]->getLoc().x <<" y:" << enemyList[0]->getLoc().y << " z:" << enemyList[0]->getLoc().z << endl;
+	if (m_itemBox.CollisionCheck(players[0]->getLoc())) {
+		players[1]->Update_HP(-35);
 	}
-	LeaveCriticalSection(&consoleCS);*/
+	else if(m_itemBox.CollisionCheck(players[1]->getLoc())) {
+		players[0]->Update_HP(-35);
 	}
+
+	for (int i = 0; i < 2; ++i)
+		players[i]->aliveCnt(fElapsedTime);
 }
 
 
-
-
-// 이건 아직 미완이죠?
-// 인자에 다른 클라이언트의 playerinfo를 받을 수 있게 구조체를 해야됨. 
 DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
 	ThreadArg* data = static_cast<ThreadArg*>(arg);
 	SOCKET clientSocket = data->clientSocket;
@@ -234,47 +213,48 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
 
 	// Main thread loop
 	while (true) {
-		//ResetEvent(server->m_hUpdateEvent[clientIndex]);
-		// Receive PlayerInfo structure from client
-		recvSize = recv(clientSocket, (char*)&server->updateInfo[clientIndex], sizeof(server->updateInfo[clientIndex]), MSG_WAITALL);
+		recvSize = recv(clientSocket, (char*)&server->updateInfo[clientIndex], sizeof(UpdateInfo), MSG_WAITALL);
+		if (server->updateInfo[clientIndex].useItem[0]) {
+			server->players[clientIndex]->plusDEF(3);
+			std::cout << "Client " << clientIndex << " 방어력 증가" << std::endl;
+		}
+		if (server->updateInfo[clientIndex].useItem[1]) {
+			server->players[clientIndex]->plusHP(200);
+			std::cout << "Client " << clientIndex << " 체력 증가" << std::endl;
+		}
 		if (recvSize <= 0) {
 			std::cout << "Client " << clientIndex << " disconnected or error occurred. Closing connection." << std::endl;
-			/*EnterCriticalSection(&server->consoleCS);
-			SetCursorPosition(0, 5);
-			LeaveCriticalSection(&server->consoleCS);*/
 			break;
 		}
-
-		server->players[clientIndex]->setLoc(server->updateInfo[clientIndex].cameraEYE);		//임시 코드 updateinfo로 하면 지울거
+		glm::vec3 playerPos = server->updateInfo[clientIndex].cameraEYE;
+		playerPos.y = 0;
+		server->players[clientIndex]->setLoc(playerPos);
+		int weaponNumber = server->updateInfo[clientIndex].weaponType;
+		server->players[clientIndex]->setweapon(weaponNumber);
 
 		// 1이 공격 0이 이동
 		if (server->updateInfo[clientIndex].flag == 1) {
-			int weaponNumber = server->updateInfo[clientIndex].weaponType;
-			server->players[clientIndex]->setweapon(weaponNumber);
 			WaitForSingleObject(server->hWriteEvent, INFINITE);
 			server->players[clientIndex]->attack_check(server->enemyList, &server->updateInfo[clientIndex], weaponNumber);
-			// 여기서 이벤트 사용 하나 더 할 예정
-			// std::cout << "Player " << clientIndex << " is attacking!" << std::endl;
-			// 여기에 좀비 체력 업데이트 함수 사용
-			//SetCursorPosition(0, 20);
-			//std::cout << "클라이언트" << clientIndex + 1 << "가 공격" << std::endl;
-		
-
 			SetEvent(server->hWriteEvent);
 			continue;
 		}
 
-		//SetEvent(server->client_events[clientIndex]);
-
-		WaitForSingleObject(server->m_hUpdateEvent, INFINITE);
 
 	//// Prepare renderInfo to send back to the client
+
 		server->FillRenderInfo(server->renderInfo[clientIndex], server->enemyList, server->players[clientIndex]);
 
 		// Send renderInfo back to the client
-		send(clientSocket, (char*)&server->renderInfo[clientIndex], sizeof(server->renderInfo[clientIndex]), 0);
+		if (renderInfo[clientIndex].remainTime == 0) {
+			send(clientSocket, (char*)&server->renderInfo[clientIndex], sizeof(server->renderInfo[clientIndex]), 0);
+			break;
+		}
+		else
+			send(clientSocket, (char*)&server->renderInfo[clientIndex], sizeof(server->renderInfo[clientIndex]), 0);
 	}
-
+	int sendScore = server->players[clientIndex]->getScore();
+	send(clientSocket, (char*)&sendScore, sizeof(int), 0);
 
 	delete data; // Free the dynamically allocated ThreadArg
 	closesocket(clientSocket);
@@ -284,16 +264,19 @@ DWORD WINAPI TCPServer::ClientThread(LPVOID arg) {
 void TCPServer::FillRenderInfo(RenderInfo& renderInfo, const std::vector<EnemyBase*>& enemyList, Player* player)
 {
 	renderInfo.HP = player->getHP();
-	renderInfo.ammo = player->getammo();
 
 	for (size_t i = 0; i < enemyList.size(); ++i) {
 		renderInfo.alive_enemy[i].HP = enemyList[i]->getHP();
 		renderInfo.alive_enemy[i].Pos = enemyList[i]->getLoc();
 		renderInfo.alive_enemy[i].Rot = enemyList[i]->getRot();
 	}
+	renderInfo.box.Pos = m_itemBox.getLoc();
+	renderInfo.box.Rot = m_itemBox.getRot();
 
-	
-	//renderInfo.remainTime = player->getRemainingTime();
+	renderInfo.score = player->getScore();
+
+	int sendRemainingTime = int(totalGameTime - timerElapsedTime);
+	renderInfo.remainTime = sendRemainingTime;
 }
 
 

@@ -86,11 +86,11 @@ void Player::setweapon(int attack)
         
     case 0:
         weapon = 0;
-        ATK = 260;
+        ATK = 230;
         break;
     case 1:
         weapon = 1;
-        ATK = 250;
+        ATK = 200;
         break;
     case 2:
         weapon = 2;
@@ -106,11 +106,6 @@ glm::vec2 Player::getWepRot()
 	return init_Weapon_rot;
 }
 
-float Player::getammo()
-{
-	return DEF;
-}
-
 
 int Player::Weapon()
 {
@@ -120,6 +115,17 @@ int Player::Weapon()
 Weapon* Player::getWeapon() const
 {
 	return cur_Wea;
+}
+
+void Player::aliveCnt(float fElapsedTime)
+{
+    if (HP <= 0) {
+        aliveTimer += fElapsedTime;
+        if (aliveTimer >= 5.0f) {
+            HP = 100;
+            aliveTimer = 0;
+        }
+    }
 }
 
 glm::vec3 CalculateAt(const glm::vec3& eye, const glm::vec2& angle) {
@@ -145,13 +151,13 @@ void Player::attack_check(std::vector<EnemyBase*>& temp_list, UpdateInfo* update
     float mindist = 200.0f;
     switch (weaponType) { // 무기에 따른 사거리 설정
     case 나이프:
-        mindist = 100.0f;
+        mindist = 20.0f;
         break;
     case 권총:
-        mindist = 2000.0f;
+        mindist = 100.0f;
         break;
     case 라이플:
-        mindist = 4000.0f;
+        mindist = 300.0f;
         break;
     }
 
@@ -256,7 +262,11 @@ void Player::attack_check(std::vector<EnemyBase*>& temp_list, UpdateInfo* update
     }
 
     if (closestZombieIndex != -1) {
-        temp_list[closestZombieIndex]->Update_HP(-(ATK + bonus_atack)); // 공격력 + 보너스 공격력 적용
+        if (updateinfo->useItem[2]) {
+            temp_list[closestZombieIndex]->Update_HP(-(ATK + bonus_atack + 350)); // 공격력 + 보너스 공격력 적용
+        }
+        else
+            temp_list[closestZombieIndex]->Update_HP(-(ATK + bonus_atack));
 
         bonus_atack = 0;
       /*  std::cout << "Zombie hit!" << closestZombieIndex<<"번째 좀비 " << "Remaining HP : " << temp_list[closestZombieIndex]->getHP() << std::endl;

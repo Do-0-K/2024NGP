@@ -44,7 +44,7 @@ private:
 protected:
 
 public:
-	Player(float hp, float max, float spd, float def, float atk, std::shared_ptr<SOCKET>& m_pSock);
+	Player(float hp, float max, float spd, float def, float atk);
 
 	// 애니메이션 함수 만들기
 	void animation();
@@ -56,7 +56,7 @@ public:
 	void conti_attack(bool);
 	void take_out_Wep();
 	void set_item(int, int);
-	void apply_item();
+	void apply_item(UpdateInfo& updateInfo);
 	void reload_ani();
 	bool do_reload_ani();
 	void knife_AT_ani();
@@ -77,4 +77,6 @@ public:
 	Weapon* getWeapon() const;		// 내가 들고 있는 무기 정보 받기
 	int Weapon();
 	bool getItemapp(int n);
+
+	void setSocket(std::shared_ptr<SOCKET>& Sock);
 };

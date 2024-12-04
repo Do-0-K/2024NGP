@@ -34,6 +34,7 @@ public:
 
 	void ProcessInput();
 	void togleMinimap();
+	void UpdateItem() { item->check_collision(); };
 
 	void Update();
 	void Render();
@@ -42,6 +43,8 @@ public:
 	{
 		return mTimer;
 	}
+
+	int getScore() { return m_nScore; }
 
 	std::shared_ptr<SOCKET> m_pSock;	// 클라이언트 소켓
 	HANDLE threadHandle;
@@ -71,4 +74,5 @@ private:
 	int mLoc;
 
 	int m_nTime = 180;
+	int m_nScore{};
 };

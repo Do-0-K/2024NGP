@@ -13,7 +13,7 @@
 
 //==========================Player===========================
 
-Player::Player(float hp, float max, float spd, float def, float atk, std::shared_ptr<SOCKET>& m_pSock)
+Player::Player(float hp, float max, float spd, float def, float atk)
 	: CharacterBase(hp, max, spd, def, atk)
 {
 	pistol = new Pistol("obj_source\\weapon\\pistol\\obj_pistol.obj", "obj_source\\weapon\\pistol\\texture_pistol.png", 1024, 1024, 10, 10, 250);
@@ -51,7 +51,6 @@ Player::Player(float hp, float max, float spd, float def, float atk, std::shared
 	type = 0;
 	bonus_atack = 0;
 
-	pSock = m_pSock;
 
 	mSound = MySound::GetInstance();
 }
@@ -331,6 +330,7 @@ void Player::setWeapon(char type)
 
 void Player::attack(std::vector<EnemyBase*>& list, CameraObj* t_camera)
 {
+	int retval;
 	if (atck) {
 		UpdateInfo updateInfo;
 		updateInfo.flag = 1;
@@ -338,17 +338,15 @@ void Player::attack(std::vector<EnemyBase*>& list, CameraObj* t_camera)
 		updateInfo.cameraangle = t_camera->getAngle();
 		updateInfo.useItem[0] = false;
 		updateInfo.useItem[1] = false;
-		updateInfo.useItem[2] = false;
-		updateInfo.useItem[3] = false;
-		updateInfo.ammo = 0;
+		updateInfo.useItem[2] = item[3];
 		updateInfo.weaponType = cur_Wea->getWep();
-
+		
 		if (cur_Wea == rifle) {
 			if (cnt % 10 == 0) {
 				cur_Wea->Shoot();
 				if (cur_Wea->exist_ammo()) {	// 총알이 있다
 					// 공격할 때 서버에게 정보 전달
-					send(*pSock, (char*)&updateInfo, sizeof(UpdateInfo), 0);
+					retval = send(*pSock, (char*)&updateInfo, sizeof(UpdateInfo), 0);
 					mSound->play_s_shot(cur_Wea->getWep());
 					cur_rot.y += 1.0f; //반동
 					init_Weapon_rot.y += 1.0f; //반동
@@ -446,16 +444,18 @@ void Player::set_item(int x, int y)
 	}
 }
 
-void Player::apply_item()
+void Player::apply_item(UpdateInfo& updateInfo)
 {
 	if (item[0]) { //방어력 증가
-		DEF += 3;
+		//DEF += 3;
+		updateInfo.useItem[0] = item[0];
 		item[0] = false;
 		std::cout << "플레이어 방어력 증가 완료 : " << DEF << std::endl;
 	}
 	if (item[1]) { //최대 체력 증가
-		MAXHP += 200;
-		HP += 200;
+		//MAXHP += 200;
+		//HP += 200;
+		updateInfo.useItem[1] = item[1];
 		item[1] = false;
 		std::cout << "플레이어 최대 체력 증가 증가 완료 : " << MAXHP << std::endl;
 	}
@@ -466,9 +466,9 @@ void Player::apply_item()
 		std::cout << "플레이어 탄약 수 증가 완료 : " << std::endl;
 	}
 	if (item[3]) { //공격력 증가
-		bonus_atack = 55;
-		item[3] = false;
-		std::cout << "플레이어 공격력 증가 완료 : " << ATK << std::endl;
+		//bonus_atack = 55;
+		updateInfo.useItem[2] = true;
+		//std::cout << "플레이어 공격력 증가 완료 : " << ATK << std::endl;
 	}
 }
 
@@ -1192,4 +1192,9 @@ void Player::attack_send(int state)
 bool Player::getItemapp(int n)
 {
 	return item[n];
+}
+
+void Player::setSocket(std::shared_ptr<SOCKET>& Sock)
+{
+	pSock = Sock;
 }

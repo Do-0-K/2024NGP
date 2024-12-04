@@ -6,6 +6,7 @@
 #include "stdafx.h"
 #include "NM_zombie.h"
 #include "Player.h"
+#include "ItemBox.h"
 
 
 #define Portnum 25715
@@ -30,6 +31,7 @@ public:
     void AcceptClients();
     static DWORD WINAPI ClientThread(LPVOID arg);
     void FillRenderInfo(RenderInfo& renderInfo, const std::vector<EnemyBase*>& enemyList, Player* player);
+    float fElapsedTime;
 private:
     
     SOCKET listen_sock = NULL;
@@ -38,10 +40,6 @@ private:
     std::vector<HANDLE> client_events; // Event objects for thread synchronization
     
     // Event for synchronization
-    //std::vector<HANDLE> m_hUpdateEvent;  // 업데이트 완료 시 신호
-    HANDLE m_hUpdateEvent;
-
-    //HANDLE hReadEvent;
     HANDLE hWriteEvent;
 
     int clientCount = 0;
@@ -57,4 +55,10 @@ private:
     __int64 m_nQueryPerfomancFrequency;
     __int64 m_nLastTime;
     __int64 m_nCurrentTime;
+
+    float totalGameTime = 180.0f;                        // 게임 시간
+    float timerElapsedTime{};                            // 지난 시간
+
+    ItemBox m_itemBox;
+
 };

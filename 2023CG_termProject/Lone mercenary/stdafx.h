@@ -47,19 +47,18 @@ struct ObjectInfo {         // Store object(enemy, box, etc.) information
 
 struct RenderInfo {         // The packet which server sends to client
     int HP;
-    int ammo;
     PlayerInfo opposite;
     ObjectInfo alive_enemy[14];
     ObjectInfo box;
     int remainTime;
+    int score;
 };
 
 struct UpdateInfo {         // The packet which client sends to server
     int flag;
-    bool useItem[4];
+    bool useItem[3];
     glm::vec3 cameraEYE;
     glm::vec2 cameraangle;
-    int ammo;
     int weaponType;
 
 };

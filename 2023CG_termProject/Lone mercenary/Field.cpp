@@ -3,29 +3,6 @@
 #include "NM_zombie.h"
 #include "ShaderProgram.h"
 
-//#pragma pack(1)
-//struct PlayerInfo {
-//	glm::vec3 cameraEYE;
-//	glm::vec2 Angle;
-//};
-//
-//struct ObjectInfo {
-//	int HP;
-//	glm::vec3 Pos;
-//	glm::vec2 Rot;
-//};
-//
-//struct RenderInfo {
-//	int HP;
-//	int ammo;
-//	PlayerInfo opposite;
-//	ObjectInfo alive_enemy[14];
-//	ObjectInfo box;
-//	int remainTime;
-//};
-//
-//#pragma pack()
-
 int Field::first_zom = 0;
 
 DWORD WINAPI NetworkingThread(LPVOID args)
@@ -35,6 +12,7 @@ DWORD WINAPI NetworkingThread(LPVOID args)
 	while (1) {
 		RenderInfo renderInfo;
 		retval = recv(*(pField->m_pSock), (char*)&renderInfo, sizeof(RenderInfo), MSG_WAITALL);
+		WaitForSingleObject(pField->hReadEvnet, INFINITE);
 		ResetEvent(pField->hWriteEvent);
 		
 		pField->UpdateFromPacket(&renderInfo);
@@ -79,29 +57,26 @@ Field::~Field()
 void Field::Update()
 {
 	// 플레이어 아이템 적용
-	dynamic_cast<Player*>(mPlayer)->apply_item();
-	// 업데이트 헤더에서 애니메이션 적용하기
-	dynamic_cast<Player*>(mPlayer)->animation();
-	mCamera->setCameraEYE(dynamic_cast<Player*>(mPlayer)->getLoc());		// 카메라 업데이트 해주기
-	mCamera->setCameraAngle(dynamic_cast<Player*>(mPlayer)->getRot());
-	dynamic_cast<Player*>(mPlayer)->attack(enemy_list, mCamera);
-	mCamera->setCameraAngle(dynamic_cast<Player*>(mPlayer)->getRot());
-	// 여기서 서버에게 위치랑 필요한거 넘기기
-
-
-	//PlayerInfo playerInfo{ mCamera->getEYE(), mCamera->getAngle() };
-	/* 내 위치 보내기*/
-
 	UpdateInfo updateInfo;
-	updateInfo.flag = 0;
-	updateInfo.cameraEYE = mCamera->getEYE();
-	updateInfo.cameraangle = mCamera->getAngle();
 	updateInfo.useItem[0] = false;
 	updateInfo.useItem[1] = false;
 	updateInfo.useItem[2] = false;
-	updateInfo.useItem[3] = false;
-	updateInfo.ammo = 0;
-	updateInfo.weaponType = 0;
+	dynamic_cast<Player*>(mPlayer)->apply_item(updateInfo);
+	// 업데이트 헤더에서 애니메이션 적용하기
+	if (mPlayer->getHP() > 0)
+		dynamic_cast<Player*>(mPlayer)->animation();
+	mCamera->setCameraEYE(dynamic_cast<Player*>(mPlayer)->getLoc());		// 카메라 업데이트 해주기
+	mCamera->setCameraAngle(dynamic_cast<Player*>(mPlayer)->getRot());
+	if (mPlayer->getHP() > 0)
+		dynamic_cast<Player*>(mPlayer)->attack(enemy_list, mCamera);
+	mCamera->setCameraAngle(dynamic_cast<Player*>(mPlayer)->getRot());
+
+
+	updateInfo.flag = 0;
+	updateInfo.cameraEYE = mCamera->getEYE();
+	updateInfo.cameraangle = mCamera->getAngle();
+	updateInfo.weaponType = dynamic_cast<Player*>(mPlayer)->getWeapon()->getWep();
+	//std::cout << "지금 든 무기" << updateInfo.weaponType << std::endl;
 
 	int retval = send(*m_pSock, (char*)&updateInfo, sizeof(UpdateInfo), 0);
 
@@ -117,79 +92,9 @@ void Field::Update()
 	dynamic_cast<Player*>(mPlayer)->reload_ani();
 	dynamic_cast<Player*>(mPlayer)->knife_AT_ani();
 
-	// ==============이 부분을 스레드로 옮기자===================
-	//RenderInfo renderInfo;
-	//retval = recv(*m_pSock, (char*)&renderInfo, sizeof(RenderInfo), MSG_WAITALL);
-	//if (retval == 0) {
-	//	std::cout << "받은 정보가 없음" << std::endl;
-	//	exit(1);
-	//}
-	//// 옳바른 각으로 회전하는지 확인 필요
-	//glm::vec3 oppEYE = renderInfo.opposite.cameraEYE;
-	//glm::vec2 oppAngle = renderInfo.opposite.Angle;
-	//oppEYE.y = 0; oppAngle.y = 0;
-
-	//m_pOpposite->setLoc(oppEYE);
-	//m_pOpposite->setRot(oppAngle);
-
-	//m_pOpposite->UpdateMatrix();
-
-	// ==========================================================
-
-	/*m_pOpposite->setLoc(tempOppEYE);
-	m_pOpposite->setRot(tempOppAngle);
-
-	m_pOpposite->UpdateMatrix();*/
-	// 서버에서 받을 예정, 준비 되면 삭제
-	//===========================================================
-	/*int alive{};
-	EnemyBase* aliveEnemy[MAX_ALIVE];
-	bool update_first = false;
-	for (int i = first_zom; i < enemy_list.size(); ++i) {
-		if (not enemy_list[i]->Death_check()) {
-			if (not update_first) {
-				first_zom = i;
-				update_first = true;
-			}
-			aliveEnemy[alive++] = enemy_list[i];
-			if (MAX_ALIVE == alive)
-				break;
-		}
-	}*/
-	/*float y{};
-	static float rot{};
-	for (EnemyBase*& enemy : enemy_list) {
-		enemy->setLoc(glm::vec3(0.0, y, 0.0));
-		enemy->setRot(glm::vec2(rot, 0.0));
-		dynamic_cast<NM_zombie*>(enemy)->UpdateMatrix();
-		y += 10.0;
-		rot += 2.0f;
-	}*/
-
-
-	// 좀비의 움직임, 지금은 비활성
-	/*for (int i = 0; i < alive; ++i) {
-		aliveEnemy[i]->setPlayerLoc(mPlayer);
-		if (dynamic_cast<NM_zombie*>(aliveEnemy[i])->getlarm()->collision_check(*mField->gethouse_1())
-			|| dynamic_cast<NM_zombie*>(aliveEnemy[i])->getlarm()->collision_check(*mField->gethouse_2())
-			|| dynamic_cast<NM_zombie*>(aliveEnemy[i])->getlarm()->collision_check(*mField->gethouse_3())
-			|| dynamic_cast<NM_zombie*>(aliveEnemy[i])->getlarm()->collision_check(*mField->gethouse_4())
-			|| check_zomcol(aliveEnemy, i))
-			aliveEnemy[i]->walk_ani(1);
-		else
-			aliveEnemy[i]->walk_ani(0);
-		aliveEnemy[i]->attack();
-		dynamic_cast<NM_zombie*>(aliveEnemy[i])->z_heal(enemy_list);
-		dynamic_cast<NM_zombie*>(aliveEnemy[i])->z_boom();
-	}*/
-	//==============================================================================
-
-	// 서버가 아이템 박스 관리
-	//===================================================
 	item->check_collision();
-	//item->check_time();
-	item->rot_ani();
-	//====================================================
+	item->cntCheck();
+
 	mUi->Update(m_nTime);
 }
 
@@ -207,6 +112,7 @@ void Field::UpdateFromPacket(void* pData)
 	}
 
 	item->setLoc(pInfo->box.Pos);
+	item->setRot(pInfo->box.Rot);
 
 	glm::vec3 oppEYE = pInfo->opposite.cameraEYE;
 	glm::vec2 oppAngle = pInfo->opposite.Angle;
@@ -217,6 +123,10 @@ void Field::UpdateFromPacket(void* pData)
 
 	m_pOpposite->UpdateMatrix();
 
+	m_nTime = pInfo->remainTime;
+	m_nScore = pInfo->score;
+
+	//mUi->Update(m_nTime);
 }
 
 // 상대 위치 테스트용 키 입력 함수

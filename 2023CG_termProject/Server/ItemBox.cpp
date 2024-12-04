@@ -1,79 +1,27 @@
 #include "ItemBox.h"
 
-ItemBox::ItemBox(GameTimer* t_time, CharacterBase* t_play)
-	: timer(t_time), mPlayer(t_play)
+void ItemBox::AnimateObject(float fElapsedTime)
 {
-	box = new Mesh("obj_source\\field\\item_box.obj", "obj_source\\field\\item_box.png", 1024, 1024);
-	box->init_scale(0.5);
-	exist = false;
-	remaining = 8;
-	l_time = clock();
-
-}
-
-ItemBox::~ItemBox()
-{
-	delete box;
-	timer = nullptr;
-	mPlayer = nullptr;
-
-}
-
-
-
-void ItemBox::check_collision()
-{
-	if (exist) {
-		if (glm::distance(glm::vec3(dynamic_cast<Player*>(mPlayer)->getLoc().x , 0, dynamic_cast<Player*>(mPlayer)->getLoc().z), cur_loc) < 5) {
-			exist = false;
-			l_time = clock();
-			int heal = 2;
-			if (mPlayer->getHP() < 100) {
-				heal = 6;
-			}
-			std::random_device rd;
-			std::default_random_engine dre(rd());
-			std::uniform_int_distribution<int> uid(1, 10);
-
-			
-
-			if (uid(dre) <= heal || dynamic_cast<Player*>(mPlayer)->getWeapon()->getWep() == ³ªÀÌÇÁ)
-				mPlayer->Update_HP(50);
-			else
-				dynamic_cast<Player*>(mPlayer)->getWeapon()->plusammo(100);
-		}
+	std::default_random_engine dre;
+	std::uniform_int_distribution uid(-50, 50);
+	m_fElapsedTime += fElapsedTime;
+	if (m_fElapsedTime >= 8.0f && !m_bLive) {
+		cur_loc.x = uid(dre);
+		cur_loc.z = uid(dre);
+		cur_loc.y = 0;
+	}
+	cur_rot.x += 30.0f * fElapsedTime;
+	if (cur_rot.x >= 360.0f) {
+		cur_rot.x -= 360.0f;
 	}
 }
 
-void ItemBox::rot_ani()
+bool ItemBox::CollisionCheck(glm::vec3 pPos)
 {
-	if (exist) {
-		cur_rot.x += 20.0f / 60.0f;
-		if (cur_rot.x >= 360)
-			cur_rot.x -= 360;
-		box->setRot(cur_rot);
+	if (distance(cur_loc, pPos) < 14) {
+		m_fElapsedTime = 0.0f;
+		cur_loc.y = -200.0f;
+		return true;
 	}
-}
-
-
-void ItemBox::check_time()
-{
-	if (not exist) {
-		i_time = clock();
-		int cc = static_cast<int>((i_time - l_time) / CLOCKS_PER_SEC);
-		if (cc >= remaining) {
-			exist = true;
-			setLoc();
-		}
-	}
-}
-
-void ItemBox::setLoc()
-{
-	std::random_device rd;
-	std::default_random_engine dre(rd());
-	std::uniform_int_distribution<int> uid(-45, 45);
-	cur_loc = glm::vec3(uid(dre), 0, uid(dre));
-	cur_rot = glm::vec2(0.0f);
-	box->setLoc(cur_loc);
+	return false;
 }
