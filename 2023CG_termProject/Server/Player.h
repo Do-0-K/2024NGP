@@ -22,7 +22,7 @@ private:
 	int weapon;
 	int cnt; //적당한 시간에 쏘자!
 	int bonus_atack;
-	
+	int score;
 	float angle;
 	int type;
 	Scene* mScene;
@@ -31,7 +31,7 @@ private:
 	Weapon* rifle;
 	Weapon* knife;
 	
-	
+	float aliveTimer{};
 
 protected:
 
@@ -40,7 +40,11 @@ public:
 
 	// 애니메이션 함수 만들기
 
-
+	void plusHP(int rhs) {
+		MAXHP += rhs;
+		HP += rhs;
+	}
+	void plusDEF(int rhs) { DEF += rhs; }
 
 	void attack_check(std::vector<EnemyBase*>& temp_list, UpdateInfo* playerinfo, int& weaponType);	// 광선이 좀비랑 닿았나?
 	glm::vec3 RaytoPlaneXY(glm::vec3,glm::vec3,float);			// XY평면 투영
@@ -51,11 +55,14 @@ public:
 	glm::vec2 getRot();				// 현재 바라보는 방향 받아오기	AT
 	void setLoc(glm::vec3& Pos);				// 위치 설정하기	EYE
 	void setRot(glm::vec2& At);				//  방향 설정하기	AT
+	void Plusscore(const int& n);
+	int getScore();
 	void setweapon(int attack);
 	glm::vec2 getWepRot();			// 현재 바라보는 방향에 맞춰 총기위치 지정하기
-	float getammo();
 	Weapon* getWeapon() const;		// 내가 들고 있는 무기 정보 받기
 	int Weapon();
+
+	void aliveCnt(float fElapsedTime);
 	
 	bool getItemapp(int n);
 };

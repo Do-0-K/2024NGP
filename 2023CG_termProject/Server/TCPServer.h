@@ -8,12 +8,11 @@
 #include "Player.h"
 #include "ItemBox.h"
 
+
 #define Portnum 25715
 #define MAX_ENEMY_COUNT 100  // 최대 적 생성 개수
 class TCPServer;
 class Player;
-class ItemBox;
-class GameTimer;
 
 struct ThreadArg {
     SOCKET clientSocket;
@@ -32,6 +31,7 @@ public:
     void AcceptClients();
     static DWORD WINAPI ClientThread(LPVOID arg);
     void FillRenderInfo(RenderInfo& renderInfo, const std::vector<EnemyBase*>& enemyList, Player* player);
+    float fElapsedTime;
 private:
     
     SOCKET listen_sock = NULL;
@@ -40,9 +40,6 @@ private:
     std::vector<HANDLE> client_events; // Event objects for thread synchronization
     
     // Event for synchronization
-    std::vector<HANDLE> m_hUpdateEvent;  // 업데이트 완료 시 신호
-
-    //HANDLE hReadEvent;
     HANDLE hWriteEvent;
 
     int clientCount = 0;
@@ -50,9 +47,18 @@ private:
    int max_enemycount = 14;
     std::vector<EnemyBase*> enemyList;  // Enemy list
     std::vector<Player*> players;  // Enemy list
-    ItemBox* item;
-    GameTimer* timer;
+   
     static UpdateInfo updateInfo[2];           // Update information for 2 clients
     static RenderInfo renderInfo[2];           // Render information for 2 clients
     static PlayerInfo playerinfo[2];           // 임시로 만든거
+
+    __int64 m_nQueryPerfomancFrequency;
+    __int64 m_nLastTime;
+    __int64 m_nCurrentTime;
+
+    float totalGameTime = 180.0f;                        // 게임 시간
+    float timerElapsedTime{};                            // 지난 시간
+
+    ItemBox m_itemBox;
+
 };

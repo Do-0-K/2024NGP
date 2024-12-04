@@ -1,8 +1,8 @@
 #include "NM_zombie.h"
 #include "Mesh.h"
 #include "Player.h"
-#include "Field.h"
-#include "GameTimer.h"
+//#include "Field.h"
+//#include "GameTimer.h"
 
 NM_zombie::NM_zombie() : EnemyBase() {
 	HP = 0;
@@ -171,13 +171,16 @@ NM_zombie::~NM_zombie()
 
 void NM_zombie::setPlayer(std::vector<Player*>& players)
 {
+	mPlayer = nullptr;
 	float minDistance = std::numeric_limits<float>::max();
 	for (const auto& player : players) {
-		glm::vec3 playerLoc = player->getLoc();
-		float distance = glm::distance(cur_loc, playerLoc);
-		if (distance < minDistance) {
-			minDistance = distance;
-			mPlayer = player;
+		if (player->getHP() > 0) {
+			glm::vec3 playerLoc = player->getLoc();
+			float distance = glm::distance(cur_loc, playerLoc);
+			if (distance < minDistance) {
+				minDistance = distance;
+				mPlayer = player;
+			}
 		}
 	}
 	
@@ -185,95 +188,97 @@ void NM_zombie::setPlayer(std::vector<Player*>& players)
 
 
 void NM_zombie::walk_ani(EnemyBase* t_list[], int myNum) {
-	glm::vec3 z_pos = glm::vec3(cur_loc.x, 0, cur_loc.z);
-	glm::vec3 p_pos = glm::vec3(dynamic_cast<Player*>(mPlayer)->getLoc().x, 0, dynamic_cast<Player*>(mPlayer)->getLoc().z);
+	if (mPlayer) {
+		glm::vec3 z_pos = glm::vec3(cur_loc.x, 0, cur_loc.z);
+		glm::vec3 p_pos = glm::vec3(dynamic_cast<Player*>(mPlayer)->getLoc().x, 0, dynamic_cast<Player*>(mPlayer)->getLoc().z);
 
-	float slope;
+		float slope;
 
-	if (z_pos.x == p_pos.x) {
-		slope = (z_pos.z - p_pos.z) / (z_pos.x - (p_pos.x + 0.0000000001));
-	}
-	else {
-		slope = (z_pos.z - p_pos.z) / (z_pos.x - p_pos.x);
-	}
+		if (z_pos.x == p_pos.x) {
+			slope = (z_pos.z - p_pos.z) / (z_pos.x - (p_pos.x + 0.0000000001));
+		}
+		else {
+			slope = (z_pos.z - p_pos.z) / (z_pos.x - p_pos.x);
+		}
 
-	float angle = glm::atan(slope);
-	float degree = angle * 180 / glm::pi<float>();
+		float angle = glm::atan(slope);
+		float degree = angle * 180 / glm::pi<float>();
 
-	if (z_pos.x > p_pos.x)
-		degree += 180;
+		if (z_pos.x > p_pos.x)
+			degree += 180;
 
-	cur_rot.x = degree;
-	glm::vec3 dir = glm::normalize(glm::vec3(glm::cos(glm::radians(cur_rot.x)), 0, glm::sin(glm::radians(cur_rot.x))));
+		cur_rot.x = degree;
+		glm::vec3 dir = glm::normalize(glm::vec3(glm::cos(glm::radians(cur_rot.x)), 0, glm::sin(glm::radians(cur_rot.x))));
 
 
 
-	// Boundary and building collision detection
-	bool collision = false;
+		// Boundary and building collision detection
+		bool collision = false;
 
-	// Check boundaries
-	if (cur_loc.x >= 150.0f || cur_loc.x <= -150.0f) {
-		collision = true;
-	}
-	if (cur_loc.z >= 150.0f || cur_loc.z <= -150.0f) {
-		collision = true;
-	}
-
-	// Check building collision
-	if ((-150.0f <= cur_loc.x && cur_loc.x <= -50.0f) || (50.0f <= cur_loc.x && cur_loc.x <= 150.0f)) {
-		if (-150.0f <= cur_loc.z && cur_loc.z <= -50.0f) {
+		// Check boundaries
+		if (cur_loc.x >= 150.0f || cur_loc.x <= -150.0f) {
 			collision = true;
 		}
-		if (50.0f <= cur_loc.z && cur_loc.z <= 150.0f) {
+		if (cur_loc.z >= 150.0f || cur_loc.z <= -150.0f) {
 			collision = true;
 		}
-	}
-	// 좀비 간 충돌
-	for (int i = 0; i < myNum; ++i) {
-		if (dynamic_cast<NM_zombie*>(t_list[myNum])->getlarm()->collision_check(
-			*(dynamic_cast<NM_zombie*>(t_list[i])->getlarm())) ||
-			dynamic_cast<NM_zombie*>(t_list[myNum])->getlarm()->collision_check(
-				*(dynamic_cast<NM_zombie*>(t_list[i])->getrarm())) ||
-			dynamic_cast<NM_zombie*>(t_list[myNum])->getlarm()->collision_check(
-				*(dynamic_cast<NM_zombie*>(t_list[i])->getbody())) ||
-			dynamic_cast<NM_zombie*>(t_list[myNum])->getrarm()->collision_check(
+
+		// Check building collision
+		if ((-150.0f <= cur_loc.x && cur_loc.x <= -50.0f) || (50.0f <= cur_loc.x && cur_loc.x <= 150.0f)) {
+			if (-150.0f <= cur_loc.z && cur_loc.z <= -50.0f) {
+				collision = true;
+			}
+			if (50.0f <= cur_loc.z && cur_loc.z <= 150.0f) {
+				collision = true;
+			}
+		}
+		// 좀비 간 충돌
+		for (int i = 0; i < myNum; ++i) {
+			if (dynamic_cast<NM_zombie*>(t_list[myNum])->getlarm()->collision_check(
 				*(dynamic_cast<NM_zombie*>(t_list[i])->getlarm())) ||
-			dynamic_cast<NM_zombie*>(t_list[myNum])->getrarm()->collision_check(
-				*(dynamic_cast<NM_zombie*>(t_list[i])->getrarm())) ||
-			dynamic_cast<NM_zombie*>(t_list[myNum])->getrarm()->collision_check(
-				*(dynamic_cast<NM_zombie*>(t_list[i])->getbody())) ||
-			dynamic_cast<NM_zombie*>(t_list[myNum])->getbody()->collision_check(
-				*(dynamic_cast<NM_zombie*>(t_list[i])->getlarm())) ||
-			dynamic_cast<NM_zombie*>(t_list[myNum])->getbody()->collision_check(
-				*(dynamic_cast<NM_zombie*>(t_list[i])->getrarm())) ||
-			dynamic_cast<NM_zombie*>(t_list[myNum])->getbody()->collision_check(
-				*(dynamic_cast<NM_zombie*>(t_list[i])->getbody())))
-			collision = true;
+				dynamic_cast<NM_zombie*>(t_list[myNum])->getlarm()->collision_check(
+					*(dynamic_cast<NM_zombie*>(t_list[i])->getrarm())) ||
+				dynamic_cast<NM_zombie*>(t_list[myNum])->getlarm()->collision_check(
+					*(dynamic_cast<NM_zombie*>(t_list[i])->getbody())) ||
+				dynamic_cast<NM_zombie*>(t_list[myNum])->getrarm()->collision_check(
+					*(dynamic_cast<NM_zombie*>(t_list[i])->getlarm())) ||
+				dynamic_cast<NM_zombie*>(t_list[myNum])->getrarm()->collision_check(
+					*(dynamic_cast<NM_zombie*>(t_list[i])->getrarm())) ||
+				dynamic_cast<NM_zombie*>(t_list[myNum])->getrarm()->collision_check(
+					*(dynamic_cast<NM_zombie*>(t_list[i])->getbody())) ||
+				dynamic_cast<NM_zombie*>(t_list[myNum])->getbody()->collision_check(
+					*(dynamic_cast<NM_zombie*>(t_list[i])->getlarm())) ||
+				dynamic_cast<NM_zombie*>(t_list[myNum])->getbody()->collision_check(
+					*(dynamic_cast<NM_zombie*>(t_list[i])->getrarm())) ||
+				dynamic_cast<NM_zombie*>(t_list[myNum])->getbody()->collision_check(
+					*(dynamic_cast<NM_zombie*>(t_list[i])->getbody())))
+				collision = true;
+		}
+		// Reverse movement if collision occurs
+		if (collision) {
+			cur_loc -= (speed * dir) / 60.0f;
+
+		}
+		else {
+			// Move zombie forward
+			cur_loc += (speed * dir) / 60.0f;
+		}
+		if (glm::distance(cur_loc, p_pos) < 3)
+			cur_loc -= (speed * dir) / 60.0f;
+		// Update zombie position and rotation
+		head->setLoc(cur_loc);
+		head->setRot(cur_rot);
+		body->setLoc(cur_loc);
+		body->setRot(cur_rot);
+		arm[0]->setLoc(cur_loc);
+		arm[0]->setRot(cur_rot);
+		arm[1]->setLoc(cur_loc);
+		arm[1]->setRot(cur_rot);
+		leg[0]->setLoc(cur_loc);
+		leg[0]->setRot(cur_rot);
+		leg[1]->setLoc(cur_loc);
+		leg[1]->setRot(cur_rot);
 	}
-	// Reverse movement if collision occurs
-	if (collision) {
-		cur_loc -= (speed * dir) / 60.0f;
-	
-	}
-	else {
-		// Move zombie forward
-		cur_loc += (speed * dir) / 60.0f;
-	}
-	if (glm::distance(cur_loc, p_pos) < 3)
-		cur_loc -= (speed * dir) / 60.0f;
-	// Update zombie position and rotation
-	head->setLoc(cur_loc);
-	head->setRot(cur_rot);
-	body->setLoc(cur_loc);
-	body->setRot(cur_rot);
-	arm[0]->setLoc(cur_loc);
-	arm[0]->setRot(cur_rot);
-	arm[1]->setLoc(cur_loc);
-	arm[1]->setRot(cur_rot);
-	leg[0]->setLoc(cur_loc);
-	leg[0]->setRot(cur_rot);
-	leg[1]->setLoc(cur_loc);
-	leg[1]->setRot(cur_rot);
 }
 
 
@@ -378,13 +383,7 @@ void NM_zombie::setHit(bool n)
 bool NM_zombie::Death_check()
 {
 	if (HP <= 0) {
-		if (hithead){
-			GameTimer::remaining_time += 10;
-			hithead = false;
-		}
 		return true;
 	}
-
-	hithead = false;
 	return false;
 }

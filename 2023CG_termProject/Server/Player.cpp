@@ -16,9 +16,9 @@
 Player::Player(float hp, float max, float spd, float def, float atk)
 	: CharacterBase(hp, max, spd, def, atk)
 {
-	pistol = new Pistol("obj_source\\weapon\\pistol\\obj_pistol.obj", "obj_source\\weapon\\pistol\\texture_pistol.png", 1024, 1024, 10, 10, 250);
-	rifle = new Rifle("obj_source\\weapon\\rifle\\obj_rifle.obj", "obj_source\\weapon\\rifle\\texture_rifle.png", 1024, 1024, 30, 30, 270);
-	knife = new Knife("obj_source\\weapon\\knife\\Knife.obj", "obj_source\\weapon\\knife\\texture_knife.png", 1024, 1024, 1, 1, 260);
+	//pistol = new Pistol("obj_source\\weapon\\pistol\\obj_pistol.obj", "obj_source\\weapon\\pistol\\texture_pistol.png", 1024, 1024, 10, 10, 250);
+	//rifle = new Rifle("obj_source\\weapon\\rifle\\obj_rifle.obj", "obj_source\\weapon\\rifle\\texture_rifle.png", 1024, 1024, 30, 30, 270);
+	//knife = new Knife("obj_source\\weapon\\knife\\Knife.obj", "obj_source\\weapon\\knife\\texture_knife.png", 1024, 1024, 1, 1, 260);
 
 	//rifle->init_scale(0.2);
 	//rifle->init_rotate(-90, 0, 1, 0);
@@ -39,12 +39,13 @@ Player::Player(float hp, float max, float spd, float def, float atk)
 	cur_loc = glm::vec3(0, 10, 0);				// 초기 위치 지정, 이거 바꿔주면 자연스래 카메라도 위치 바뀜
 	cur_rot = glm::vec2(0.0f, 0.0f);
 	init_Weapon_rot = glm::vec2(cur_rot.x, cur_rot.y + 90.0f);
-    
-
+	
+	
 	cnt = 0;
 	angle = 0.0f;
 	type = 0;
 	bonus_atack = 0;
+    score = 0;
 
 	
 }
@@ -67,20 +68,32 @@ void Player::setLoc(glm::vec3& Pos)
 
 
 
+void Player::Plusscore(const int& n)
+{
+    score += n;
+}
+
+int Player::getScore()
+{
+    return score;
+}
+
 void Player::setweapon(int attack)
 {
+   
     switch (attack)
     {
-    case 나이프:
-        weapon = 나이프;
-        ATK = 260;
+        
+    case 0:
+        weapon = 0;
+        ATK = 230;
         break;
-    case 권총:
-        weapon = 권총;
-        ATK = 250;
+    case 1:
+        weapon = 1;
+        ATK = 200;
         break;
-    case 라이플:
-        weapon = 권총;
+    case 2:
+        weapon = 2;
         ATK = 270;
         break;
     default:
@@ -91,11 +104,6 @@ void Player::setweapon(int attack)
 glm::vec2 Player::getWepRot()
 {
 	return init_Weapon_rot;
-}
-
-float Player::getammo()
-{
-	return DEF;
 }
 
 
@@ -109,6 +117,17 @@ Weapon* Player::getWeapon() const
 	return cur_Wea;
 }
 
+void Player::aliveCnt(float fElapsedTime)
+{
+    if (HP <= 0) {
+        aliveTimer += fElapsedTime;
+        if (aliveTimer >= 5.0f) {
+            HP = 100;
+            aliveTimer = 0;
+        }
+    }
+}
+
 glm::vec3 CalculateAt(const glm::vec3& eye, const glm::vec2& angle) {
 	glm::vec3 at;
 
@@ -119,10 +138,9 @@ glm::vec3 CalculateAt(const glm::vec3& eye, const glm::vec2& angle) {
     at.y = eye.y + (40 * glm::sin(glm::radians(angle.y)));
     at.z = eye.z + (xz_dis * glm::sin(glm::radians(angle.x)));
 
-	// The "at" point in world space
-	glm::vec3 atPoint = eye + at;
 
-	return atPoint;
+
+	return at;
 }
 
 void Player::attack_check(std::vector<EnemyBase*>& temp_list, UpdateInfo* updateinfo, int& weaponType) {
@@ -133,13 +151,13 @@ void Player::attack_check(std::vector<EnemyBase*>& temp_list, UpdateInfo* update
     float mindist = 200.0f;
     switch (weaponType) { // 무기에 따른 사거리 설정
     case 나이프:
-        mindist = 200.0f;
+        mindist = 20.0f;
         break;
     case 권총:
-        mindist = 3000.0f;
+        mindist = 100.0f;
         break;
     case 라이플:
-        mindist = 8000.0f;
+        mindist = 300.0f;
         break;
     }
 
@@ -207,6 +225,7 @@ void Player::attack_check(std::vector<EnemyBase*>& temp_list, UpdateInfo* update
                 if (contact_distance[i] == 0.0f || dist < contact_distance[i]) {
                     contact_distance[i] = dist;
                     is_contact = true;
+
                 }
             }
 
@@ -243,13 +262,19 @@ void Player::attack_check(std::vector<EnemyBase*>& temp_list, UpdateInfo* update
     }
 
     if (closestZombieIndex != -1) {
-        temp_list[closestZombieIndex]->Update_HP(-(ATK + bonus_atack)); // 공격력 + 보너스 공격력 적용
+        if (updateinfo->useItem[2]) {
+            temp_list[closestZombieIndex]->Update_HP(-(ATK + bonus_atack + 350)); // 공격력 + 보너스 공격력 적용
+        }
+        else
+            temp_list[closestZombieIndex]->Update_HP(-(ATK + bonus_atack));
 
         bonus_atack = 0;
-        std::cout << "Zombie hit!" << closestZombieIndex<<"번째 좀비 " << "Remaining HP : " << temp_list[closestZombieIndex]->getHP() << std::endl;
-
+      /*  std::cout << "Zombie hit!" << closestZombieIndex<<"번째 좀비 " << "Remaining HP : " << temp_list[closestZombieIndex]->getHP() << std::endl;
+        std::cout << "contact_distance: " << contact_distance[closestZombieIndex] << "distance: " << glm::distance(temp_list[closestZombieIndex]->getLoc(), updateinfo->cameraEYE) << endl;*/
         if (temp_list[closestZombieIndex]->Death_check()) {
             std::cout << "Zombie killed!" << std::endl;
+            Plusscore(50);
+            std::cout << "SCORE: " <<score<< std::endl;
         }
     }
 }

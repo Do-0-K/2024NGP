@@ -12,10 +12,13 @@ void CharacterBase::Update_HP(float received)
 	if (received > 0) {
 		HP += received;
 		if (HP >= MAXHP) HP = MAXHP;
+		
 	}
 	else {
 		//std::cout << "좀비가 받은 데미지" <<  received + DEF << '\n';
 		HP += received + DEF;		// 계산식은 나중에 생각하자
+		if (HP < 0)
+			HP = 0;
 	}
 }
 

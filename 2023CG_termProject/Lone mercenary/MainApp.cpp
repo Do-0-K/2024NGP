@@ -37,7 +37,7 @@ bool MainApp::Initialize()
 	pKeyboard->setScene(current_scene);
 
 	// 게임 요소 초기화
-	MainAppConnect();
+	//MainAppConnect();
 
 	return true;
 }
@@ -88,7 +88,7 @@ void MainApp::next_state()
 		if (pMouse->next_state()) {
 			game_state = 아이템선택;
 			delete current_scene;
-			mPlayer = new Player(100, 200, 40, 20, 0,m_pSock); //when make player, also make player's socket
+			mPlayer = new Player(100, 200, 40, 20, 0);
 			current_scene = new Select_Item(mPlayer, cubemap);
 			pKeyboard->setGame_stete(game_state);
 			pKeyboard->setScene(current_scene);
@@ -105,6 +105,8 @@ void MainApp::next_state()
 			delete current_scene;
 			e_arrayReady();
 			game_timer = new GameTimer(mPlayer);
+			MainAppConnect();
+			dynamic_cast<Player*>(mPlayer)->setSocket(m_pSock);
 			current_scene = new Field(mPlayer, field, camera, proj, enemy_array, game_timer, cubemap, m_pSock);
 			score_scene = new ScoreBoard(cubemap, enemy_array, game_timer, camera);
 			pKeyboard->setGame_stete(game_state);
@@ -121,8 +123,7 @@ void MainApp::next_state()
 		if (game_timer->getremaining() == 0) { //time over = game over
 			glutSetCursor(GLUT_CURSOR_RIGHT_ARROW);
 			game_state = 결과창;
-			// 결과창 내보내기 전에 서버에게 개별 점수 받기
-			retval = recv(*m_pSock, (char*)score, sizeof(int), 0); //take total score from server
+			score = dynamic_cast<Field*>(current_scene)->getScore();
 			dynamic_cast<ScoreBoard*>(score_scene)->SetTotalscore(score); //total score set
 			dynamic_cast<ScoreBoard*>(score_scene)->Update_1(); //finally set mesh
 			delete current_scene;
@@ -174,10 +175,8 @@ void MainApp::MainAppConnect()
 	memset(&serveraddr, 0, sizeof(serveraddr));
 	serveraddr.sin_family = AF_INET;
 
-	// 호스트의 IP 주소를 알아내기
-	//const char* hostName = "DESKTOP-SNG2JRJ";// 서버로 사용할 호스트 이름
-	//const char* hostName = "joke";
-	const char* hostName = "DESKTOP-I9R4AO6"; //실습실 서버 컴퓨터 이름
+	// 호스트의 IP 주소를 알아내기==========================================
+	const char* hostName = "농담이";// 서버로 사용할 호스트 이름
 	hostent* ptr = gethostbyname(hostName);
 	if (ptr == nullptr) {
 		std::cout << "can't find Hostname" << std::endl;
@@ -185,9 +184,12 @@ void MainApp::MainAppConnect()
 	}
 
 	memcpy(&serveraddr.sin_addr, ptr->h_addr_list[0], ptr->h_length);
+	//=======================================================================
 
-	const char* pppp = "10.20.11.28"; //실습실 서버 컴퓨터 IP
-	inet_pton(AF_INET, pppp, &serveraddr.sin_addr);
+	// 만약 못찾는다면 여기에 서버 ip 입력
+	/*const char* serverip = "255.255.255.255";
+	inet_pton(AF_INET, serverip, &serveraddr.sin_addr);*/
+
 
 	char test[22];
 	inet_ntop(AF_INET, &serveraddr.sin_addr, test, sizeof(test));

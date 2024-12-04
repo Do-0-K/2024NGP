@@ -138,9 +138,15 @@
     <ClInclude Include="CharacterBase.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="ENUM.h" />
-    <ClInclude Include="Field.h" />
+    <ClInclude Include="Field.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="FieldMap.h" />
-    <ClInclude Include="GameTimer.h" />
+    <ClInclude Include="GameTimer.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="ItemBox.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="NMMesh.h" />
@@ -154,9 +160,15 @@
   <ItemGroup>
     <ClCompile Include="CharacterBase.cpp" />
     <ClCompile Include="Enemy.cpp" />
-    <ClCompile Include="Field.cpp" />
+    <ClCompile Include="Field.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="FieldMap.cpp" />
-    <ClCompile Include="GameTimer.cpp" />
+    <ClCompile Include="GameTimer.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="ItemBox.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />

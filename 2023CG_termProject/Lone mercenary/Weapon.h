@@ -23,6 +23,8 @@ public:
 	int gettotal();
 	int getreloaded();
 
+	void setTotal(int ammo) { total_ammo = ammo; }
+
 	void plusammo(int);
 protected:
 	int weapon_num;			// 무기 번호
