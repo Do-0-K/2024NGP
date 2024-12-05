@@ -157,10 +157,12 @@ void TCPServer::AcceptClients() {
 
 
 void TCPServer::Update() {
-	/*EnterCriticalSection(&consoleCS);
-	SetCursorPosition(0, 2);
-	std::cout << "Updating game state..." << std::endl;
-	LeaveCriticalSection(&consoleCS);*/
+	EnterCriticalSection(&consoleCS);
+	for (int i = 0; i < 2; ++i) {
+		SetCursorPosition(0, 10 + 3 * i);
+		std::cout << "클라이언트["<<i<<"]의 좌표는 X : " << updateInfo[i].cameraEYE.x << "Y : " << updateInfo[i].cameraEYE.y << "Z : " << updateInfo[i].cameraEYE.z << endl;
+	}
+	LeaveCriticalSection(&consoleCS);
 
 	m_itemBox.AnimateObject(fElapsedTime);
 
@@ -169,6 +171,7 @@ void TCPServer::Update() {
 		NM_zombie* zombie = dynamic_cast<NM_zombie*>(enemyList[i]);
 		zombie->setPlayer(players);
 		if (!zombie->Death_check()) {  // Check if the zombie is alive
+			SetCursorPosition(0, 13);
 			zombie->walk_ani(enemyList.data(), i); // Pass parameters to `walk_ani`
 			zombie->attack();
 		}
@@ -178,6 +181,7 @@ void TCPServer::Update() {
 			zombie->Revive(); // Move to a random location
 		}
 		zombie->UpdateMatrix();
+		LeaveCriticalSection(&consoleCS);
 	}
 
 

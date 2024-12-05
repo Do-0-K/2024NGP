@@ -57,6 +57,7 @@ void EnemyBase::Revive()
 		break;
 	}
 	HP = 1200;
+	
 }
 
 void EnemyBase::setRot(glm::vec2 rot)
